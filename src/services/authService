@@ -1,7 +1,6 @@
-// Authentication service for API calls
-
 import { useAuthStore } from '@/stores/authStores'
 
+// Authentication service for API calls
 class AuthService {
   constructor() {
     this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'

@@ -33,7 +33,7 @@
           />
         </div>
 
-        <button type="submit" class="btn btn-primary btn-full" :disabled="loading">
+        <button type="submit" class="btn btn-auth btn-primary btn-full" :disabled="loading">
           {{ loading ? 'Logging in...' : 'Log in' }}
         </button>
       </form>

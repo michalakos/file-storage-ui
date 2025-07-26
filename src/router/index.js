@@ -1,29 +1,51 @@
+// router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import Register from '../views/Register.vue'
+import { getAuthService } from '@/services/authService'
+
+// Import your components
+import HomePage from '@/views/Home.vue'
+import LoginPage from '@/views/Login.vue'
+import RegisterPage from '@/views/Register.vue'
+import DashboardRouter from '@/views/DashboardRouter.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'HomePage',
+    component: HomePage,
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login,
+    component: LoginPage,
   },
   {
     path: '/register',
     name: 'Register',
-    component: Register,
+    component: RegisterPage,
+  },
+  {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: DashboardRouter,
+    meta: { requiresAuth: true },
   },
 ]
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+})
+
+// Navigation guard to check authentication
+router.beforeEach((to, from, next) => {
+  const authService = getAuthService()
+
+  if (to.meta.requiresAuth && !authService.isAuthenticated()) {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router

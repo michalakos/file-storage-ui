@@ -5,9 +5,9 @@
       <p class="subtitle">Please choose an option to continue</p>
 
       <div class="button-group">
-        <router-link to="/login" class="btn btn-primary"> Log In </router-link>
+        <router-link to="/login" class="btn btn-auth btn-primary"> Log In </router-link>
 
-        <router-link to="/register" class="btn btn-secondary"> Register </router-link>
+        <router-link to="/register" class="btn btn-auth btn-secondary"> Register </router-link>
       </div>
     </div>
   </div>
