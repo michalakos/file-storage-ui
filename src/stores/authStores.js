@@ -1,9 +1,9 @@
-// src/stores/auth.js
 import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: null,
+    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080',
   }),
 
   getters: {
@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', {
         return false
       }
     },
+    getBaseURL: (state) => state.baseURL,
   },
 
   actions: {
@@ -35,5 +36,11 @@ export const useAuthStore = defineStore('auth', {
       this.token = null
       localStorage.removeItem('jwt_token')
     },
+  },
+  /**
+   * Update the base URL (useful for environment switching)
+   */
+  setBaseURL(url) {
+    this.baseURL = url
   },
 })

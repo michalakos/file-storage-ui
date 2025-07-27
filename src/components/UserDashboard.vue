@@ -4,7 +4,7 @@
       <div class="header-content">
         <h1 class="app-title">File Storage</h1>
         <div class="user-info">
-          <span class="welcome-text">Welcome back, {{ username }}!</span>
+          <span class="welcome-text">Welcome back, {{ this.userData?.username ?? 'user' }}!</span>
           <button @click="handleLogout" class="btn btn-secondary">Logout</button>
         </div>
       </div>
@@ -44,8 +44,8 @@
           <div v-for="file in recentFiles" :key="file.id" class="file-item">
             <div class="file-icon">📄</div>
             <div class="file-info">
-              <h4>{{ file.name }}</h4>
-              <p class="file-meta">{{ file.size }} • {{ file.modified }}</p>
+              <h4>{{ file.filename }}</h4>
+              <p class="file-meta">{{ file.formattedFileSize }} • {{ file.formattedUploadDate }}</p>
             </div>
             <div class="file-actions">
               <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
@@ -70,17 +70,17 @@
 
 <script>
 import { getAuthService } from '@/services/authService'
+import { getUserApiService } from '@/services/userService'
+import { getFileApiService } from '@/services/fileService'
 
 export default {
   name: 'UserDashboard',
   data() {
     return {
-      username: 'User',
-      recentFiles: [
-        { id: 1, name: 'Document.pdf', size: '2.4 MB', modified: '2 hours ago' },
-        { id: 2, name: 'Image.jpg', size: '1.8 MB', modified: '1 day ago' },
-        { id: 3, name: 'Spreadsheet.xlsx', size: '856 KB', modified: '3 days ago' },
-      ],
+      userData: null,
+      loading: false,
+      error: null,
+      recentFiles: [],
       usedStorage: '2.1 GB',
       totalStorage: '10 GB',
       storagePercentage: 21,
@@ -96,18 +96,69 @@ export default {
     }
 
     await this.loadUserData()
+    await this.getRecentFiles()
   },
 
   methods: {
     async loadUserData() {
       try {
-        console.log('load user data')
-        // const authService = getAuthService()
-        // Make authenticated API calls to get user data
-        // const response = await authService.authenticatedFetch(`${authService.baseURL}/api/user/dashboard`)
-        // Update component data with real data from API
+        this.loading = true
+        this.error = null
+
+        const userApiService = getUserApiService()
+        this.userData = await userApiService.getUserAccount()
+
+        console.log('User data loaded successfully:', this.userData)
       } catch (error) {
         console.error('Failed to load user data:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getRecentFiles() {
+      try {
+        this.loading = true
+        this.error = null
+
+        const fileApiService = getFileApiService()
+
+        this.recentFiles = await fileApiService.getRecentFiles(3)
+
+        console.log('Recent files loaded:', this.recentFiles)
+
+        // Now you can access computed properties directly
+        this.recentFiles.forEach((file) => {
+          console.log(`File: ${file.filename}`)
+          console.log(`Size: ${file.formattedFileSize}`)
+          console.log(`Uploaded: ${file.formattedUploadDate}`)
+          console.log(`Type: ${file.fileExtension}`)
+          console.log(`Owner: ${file.userDto.displayName}`)
+          console.log('---')
+        })
+
+        console.log('User data loaded successfully:', this.fileData)
+      } catch (error) {
+        console.error('Failed to load user data:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async updateProfile(updatedData) {
+      try {
+        this.loading = true
+        const userApiService = getUserApiService()
+
+        this.userData = await userApiService.updateUserProfile(updatedData)
+        console.log('Profile updated successfully')
+      } catch (error) {
+        console.error('Failed to update profile:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
       }
     },
 
