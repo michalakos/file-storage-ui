@@ -61,6 +61,7 @@ export class FileMetadata {
 
   // Static factory method
   static fromApiResponse(apiData) {
+    console.log(apiData)
     return new FileMetadata(apiData)
   }
 

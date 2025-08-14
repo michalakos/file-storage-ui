@@ -7,6 +7,7 @@ import HomePage from '@/views/Home.vue'
 import LoginPage from '@/views/Login.vue'
 import RegisterPage from '@/views/Register.vue'
 import DashboardRouter from '@/views/DashboardRouter.vue'
+import FileUpload from '@/views/FileUpload.vue'
 
 const routes = [
   {
@@ -28,6 +29,12 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: DashboardRouter,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/upload',
+    name: 'Upload',
+    component: FileUpload,
     meta: { requiresAuth: true },
   },
 ]
