@@ -152,6 +152,111 @@ class FileApiService {
       throw error
     }
   }
+
+  /**
+   * Download a file by ID
+   * @param {string} fileId - The UUID of the file to download
+   * @returns {Promise<void>}
+   */
+  async downloadFile(fileId) {
+    try {
+      if (this.debug) {
+        console.log('Downloading file:', fileId)
+      }
+
+      const url = `${this.baseURL}/api/files/${fileId}/download`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'GET',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Download failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      // Get filename from Content-Disposition header or use fallback
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = 'download'
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/)
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1].replace(/['"]/g, '')
+        }
+      }
+
+      // Create blob and download
+      const blob = await response.blob()
+      const downloadUrl = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(downloadUrl)
+
+      if (this.debug) {
+        console.log('File downloaded successfully:', filename)
+      }
+    } catch (error) {
+      console.error('Failed to download file:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Delete a file by ID
+   * @param {string} fileId - The UUID of the file to download
+   * @returns {Promise<void>}
+   */
+  async deleteFile(fileId) {
+    try {
+      if (this.debug) {
+        console.log('Deleting file:', fileId)
+      }
+
+      const url = `${this.baseURL}/api/files/${fileId}`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Deletion failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      if (this.debug) {
+        console.log('File deleted successfully:', fileId)
+      }
+    } catch (error) {
+      console.error('Failed to delete file:', error)
+      throw error
+    }
+  }
 }
 
 // Create a singleton instance

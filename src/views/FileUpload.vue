@@ -287,7 +287,7 @@ export default {
     formatFileSize(bytes) {
       if (bytes === 0) return '0 Bytes'
 
-      const k = 1024
+      const k = 1000
       const sizes = ['Bytes', 'KB', 'MB', 'GB']
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
@@ -303,7 +303,7 @@ export default {
 
 <style scoped>
 .upload-container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #f8fafc;
 }
 

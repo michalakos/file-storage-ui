@@ -25,13 +25,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh; /* Changed from height to min-height */
+  min-height: 100dvh; /* Changed from height to min-height */
   padding: 20px;
 }
 
 /* Dashboard layout styles */
 .dashboard-container {
-  min-height: 100vh;
+  min-height: 100dvh;
   background-color: #f8fafc;
 }
 

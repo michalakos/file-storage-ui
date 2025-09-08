@@ -17,9 +17,8 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #fcde9c;
-  height: 100vh;
+  height: 100 vh;
   height: 100dvh; /* Dynamic viewport height for mobile */
   background: linear-gradient(135deg, #ebf063 0%, #896b2a 100%);
-  overflow: hidden;
 }
 </style>

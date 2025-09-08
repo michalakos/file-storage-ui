@@ -49,7 +49,8 @@
             </div>
             <div class="file-actions">
               <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
-              <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
+              <button class="action-btn" @click="viewShared()" title="Share">🔗</button>
+              <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
             </div>
           </div>
         </div>
@@ -58,10 +59,10 @@
       <section class="storage-usage">
         <h2>Storage Usage</h2>
         <div class="usage-card">
-          <div class="usage-bar">
+          <div class="usage-bar" :title="`${storagePercentage.toFixed(1)}% used`">
             <div class="usage-fill" :style="{ width: storagePercentage + '%' }"></div>
           </div>
-          <p class="usage-text">{{ usedStorage }} of {{ totalStorage }} used</p>
+          <p class="usage-text">{{ usedStorageFormatted }} of {{ totalStorageFormatted }} used</p>
         </div>
       </section>
     </main>
@@ -81,9 +82,8 @@ export default {
       loading: false,
       error: null,
       recentFiles: [],
-      usedStorage: '2.1 GB',
-      totalStorage: '10 GB',
-      storagePercentage: 21,
+      usedStorage: '0',
+      totalStorage: '0',
     }
   },
 
@@ -96,10 +96,30 @@ export default {
     }
 
     await this.loadUserData()
-    await this.getRecentFiles()
+    await this.refreshData()
+  },
+
+  computed: {
+    usedStorageFormatted() {
+      return this.formatFileSize(this.usedStorage)
+    },
+    totalStorageFormatted() {
+      return this.formatFileSize(this.totalStorage)
+    },
+    storagePercentage() {
+      if (this.totalStorage == null || this.totalStorage == 0) {
+        return 0
+      } else {
+        return (this.usedStorage / this.totalStorage) * 100
+      }
+    },
   },
 
   methods: {
+    async refreshData() {
+      await Promise.all([this.getRecentFiles(), this.getUsedStorage(), this.getTotalStorage()])
+    },
+
     async loadUserData() {
       try {
         this.loading = true
@@ -138,7 +158,7 @@ export default {
           console.log('---')
         })
 
-        console.log('User data loaded successfully:', this.fileData)
+        console.log('User files loaded successfully:', this.recentFiles)
       } catch (error) {
         console.error('Failed to load user data:', error)
         this.error = error.message
@@ -148,18 +168,19 @@ export default {
     },
 
     async updateProfile(updatedData) {
-      try {
-        this.loading = true
-        const userApiService = getUserApiService()
+      console.log('Update profile', updatedData)
+      // try {
+      //   this.loading = true
+      //   const userApiService = getUserApiService()
 
-        this.userData = await userApiService.updateUserProfile(updatedData)
-        console.log('Profile updated successfully')
-      } catch (error) {
-        console.error('Failed to update profile:', error)
-        this.error = error.message
-      } finally {
-        this.loading = false
-      }
+      //   this.userData = await userApiService.updateUserProfile(updatedData)
+      //   console.log('Profile updated successfully')
+      // } catch (error) {
+      //   console.error('Failed to update profile:', error)
+      //   this.error = error.message
+      // } finally {
+      //   this.loading = false
+      // }
     },
 
     uploadFile() {
@@ -174,12 +195,79 @@ export default {
       this.$router.push('/shared')
     },
 
-    downloadFile(file) {
-      console.log('Download file:', file.name)
+    async downloadFile(file) {
+      try {
+        this.loading = true
+        this.error = null
+
+        const fileService = getFileApiService()
+        await fileService.downloadFile(file.id)
+      } catch (error) {
+        console.error('Download failed:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
     },
 
-    shareFile(file) {
-      console.log('Share file:', file.name)
+    async deleteFile(file) {
+      console.log('Delete file: ', file)
+      try {
+        const fileService = getFileApiService()
+        await fileService.deleteFile(file.id)
+        await this.refreshData()
+      } catch (error) {
+        console.error('Delete failed:', error)
+      }
+    },
+
+    async getUsedStorage() {
+      console.log('Fetching used storage')
+      try {
+        this.loading = true
+        this.error = null
+
+        const userApiService = getUserApiService()
+        this.usedStorage = await userApiService.getUsedStorage()
+        // this.usedStorage = this.formatFileSize(rawStorage)
+
+        console.log('User used storage loaded successfully:', this.usedStorage)
+        console.log()
+      } catch (error) {
+        console.error('Failed to load user used storage:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getTotalStorage() {
+      console.log('Fetching total storage')
+      try {
+        this.loading = true
+        this.error = null
+
+        const userApiService = getUserApiService()
+        this.totalStorage = await userApiService.getMaximumStorage()
+        // this.totalStorage = this.formatFileSize(rawStorage)
+
+        console.log('User maximum storage loaded successfully:', this.totalStorage)
+      } catch (error) {
+        console.error('Failed to load user maximum storage:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes'
+
+      const k = 1000
+      const sizes = ['Bytes', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
 
     handleLogout() {
