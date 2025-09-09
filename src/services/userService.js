@@ -20,7 +20,7 @@ class UserApiService {
       }
 
       const response = await this.authService.authenticatedFetch(
-        `${this.baseURL}/api/user/account`,
+        `${this.baseURL}/api/users/account`,
         {
           method: 'GET',
           headers: {
@@ -73,7 +73,7 @@ class UserApiService {
       }
 
       const response = await this.authService.authenticatedFetch(
-        `${this.baseURL}/api/user/storage/used`,
+        `${this.baseURL}/api/users/storage/used`,
         {
           method: 'GET',
           headers: {
@@ -122,7 +122,7 @@ class UserApiService {
       }
 
       const response = await this.authService.authenticatedFetch(
-        `${this.baseURL}/api/user/storage/user-max`,
+        `${this.baseURL}/api/users/storage/user-max`,
         {
           method: 'GET',
           headers: {
@@ -159,6 +159,56 @@ class UserApiService {
       throw error
     }
   }
+
+  /**
+   * Search for users by keyword
+   * @param {string} keyword - Search keyword
+   * @returns {Promise<Array>} Array of matching users
+   */
+  async searchUsers(keyword) {
+    try {
+      if (this.debug) {
+        console.log('Searching users with keyword:', keyword)
+      }
+
+      const url = new URL(`${this.baseURL}/api/users`)
+      url.searchParams.append('keyword', keyword)
+
+      const response = await this.authService.authenticatedFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `User search failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const users = await response.json()
+
+      if (this.debug) {
+        console.log('User search results:', users)
+      }
+
+      return users
+    } catch (error) {
+      console.error('Failed to search users:', error)
+      throw error
+    }
+  }
 }
 
 //   /**
@@ -173,7 +223,7 @@ class UserApiService {
 //       }
 
 //       const response = await this.authService.authenticatedFetch(
-//         `${this.baseURL}/api/user/profile`,
+//         `${this.baseURL}/api/users/profile`,
 //         {
 //           method: 'PUT',
 //           headers: {

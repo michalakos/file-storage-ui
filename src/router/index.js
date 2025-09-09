@@ -8,6 +8,7 @@ import LoginPage from '@/views/Login.vue'
 import RegisterPage from '@/views/Register.vue'
 import DashboardRouter from '@/views/DashboardRouter.vue'
 import FileUpload from '@/views/FileUpload.vue'
+import FilesView from '@/views/FilesView.vue'
 
 const routes = [
   {
@@ -35,6 +36,12 @@ const routes = [
     path: '/upload',
     name: 'Upload',
     component: FileUpload,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/files',
+    name: 'Files',
+    component: FilesView,
     meta: { requiresAuth: true },
   },
 ]

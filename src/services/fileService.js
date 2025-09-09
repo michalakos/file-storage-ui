@@ -257,6 +257,117 @@ class FileApiService {
       throw error
     }
   }
+
+  /**
+   * Get paginated files for the authenticated user
+   * @param {number} page - Page number (1-based)
+   * @param {number} size - Number of items per page
+   * @returns {Promise<Object>} Paginated files response
+   */
+  async getPaginatedFiles(page = 0, size = 5) {
+    try {
+      if (this.debug) {
+        console.log(`Fetching paginated files - page: ${page}, size: ${size}`)
+      }
+
+      const url = new URL(`${this.baseURL}/api/files/paginated`)
+      url.searchParams.append('page', page.toString())
+      url.searchParams.append('size', size.toString())
+
+      const response = await this.authService.authenticatedFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Paginated files fetch failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('Paginated files response:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to load paginated files:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Share a file with another user
+   * @param {string} fileId - The UUID of the file to share
+   * @param {string} username - Username to share with
+   * @param {boolean} readOnly - Whether the share is read-only
+   * @returns {Promise<Object>} Share response
+   */
+  async shareFile(fileId, username, readOnly = true) {
+    try {
+      if (this.debug) {
+        console.log(`Sharing file ${fileId} with ${username}, readOnly: ${readOnly}`)
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/files/${fileId}/share`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            readOnly,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `File sharing failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      let result = null
+      if (response.status !== 204) {
+        result = await response.json()
+      }
+
+      if (this.debug) {
+        console.log('File shared successfully:', result || 'No content returned')
+      }
+
+      return result
+    } catch (error) {
+      console.error('Failed to share file:', error)
+      throw error
+    }
+  }
 }
 
 // Create a singleton instance

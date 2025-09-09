@@ -26,7 +26,7 @@
             <p>Organize your files with folders</p>
           </div>
 
-          <div class="action-card" @click="viewShared">
+          <div class="action-card" @click="shareFile()">
             <div class="action-icon">👥</div>
             <h3>Shared Files</h3>
             <p>Access files shared with you</p>
@@ -37,7 +37,7 @@
       <section class="recent-files">
         <div class="section-header">
           <h2>Recent Files</h2>
-          <button class="btn btn-outline">View All</button>
+          <button class="btn btn-outline" @click="this.$router.push('/files')">View All</button>
         </div>
 
         <div class="files-grid">
@@ -49,7 +49,7 @@
             </div>
             <div class="file-actions">
               <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
-              <button class="action-btn" @click="viewShared()" title="Share">🔗</button>
+              <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
               <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
             </div>
           </div>
@@ -66,6 +66,12 @@
         </div>
       </section>
     </main>
+    <ShareFileModal
+      :is-open="shareModalOpen"
+      :file="selectedFileToShare"
+      @close="closeShareModal"
+      @shared="handleFileShared"
+    />
   </div>
 </template>
 
@@ -73,9 +79,15 @@
 import { getAuthService } from '@/services/authService'
 import { getUserApiService } from '@/services/userService'
 import { getFileApiService } from '@/services/fileService'
+import ShareFileModal from '@/components/ShareFileModal.vue'
 
 export default {
   name: 'UserDashboard',
+
+  components: {
+    ShareFileModal,
+  },
+
   data() {
     return {
       userData: null,
@@ -84,6 +96,8 @@ export default {
       recentFiles: [],
       usedStorage: '0',
       totalStorage: '0',
+      shareModalOpen: false,
+      selectedFileToShare: null,
     }
   },
 
@@ -191,22 +205,33 @@ export default {
       console.log('Create folder clicked')
     },
 
-    viewShared() {
-      this.$router.push('/shared')
+    shareFile(file = null) {
+      if (file) {
+        // Sharing a specific file
+        this.selectedFileToShare = file
+        this.shareModalOpen = true
+      } else {
+        // Navigate to shared files view
+        this.$router.push('/shared')
+      }
+    },
+
+    closeShareModal() {
+      this.shareModalOpen = false
+      this.selectedFileToShare = null
+    },
+
+    handleFileShared(shareData) {
+      console.log('File shared successfully:', shareData)
     },
 
     async downloadFile(file) {
       try {
-        this.loading = true
-        this.error = null
-
         const fileService = getFileApiService()
         await fileService.downloadFile(file.id)
       } catch (error) {
         console.error('Download failed:', error)
-        this.error = error.message
-      } finally {
-        this.loading = false
+        this.error = 'Failed to download file'
       }
     },
 

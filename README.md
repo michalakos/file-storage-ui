@@ -6,8 +6,7 @@ Web app UI for use with file storage project written in Vue 3.
 
 ### Users:
 
-- Create view for sharing files
-- Create view for listing all files (paginated) with search
+- Implement search in files view
 - Create view for updating user information / password
 - User account delete button
 - Rename files
