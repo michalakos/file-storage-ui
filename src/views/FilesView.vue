@@ -2,7 +2,16 @@
   <div class="files-container">
     <header class="files-header">
       <div class="header-content">
-        <h1 class="page-title clickable" @click="goToDashboard">My Files</h1>
+        <h1 class="page-title-button" @click="goToDashboard">My Files</h1>
+        <div class="search-section">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Search files by name..."
+            class="search-input"
+            @input="handleSearchInput"
+          />
+        </div>
         <div class="header-actions">
           <button @click="uploadFile" class="btn btn-primary">📁 Upload Files</button>
         </div>
@@ -39,6 +48,7 @@
               </div>
               <div class="file-actions">
                 <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
+                <button class="action-btn" @click="renameFile(file)" title="Rename">✏️</button>
                 <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
                 <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
               </div>
@@ -98,6 +108,8 @@ export default {
   data() {
     return {
       files: [],
+      searchQuery: '',
+      searchTimeout: null,
       loading: false,
       error: null,
       shareModalOpen: false,
@@ -120,19 +132,22 @@ export default {
 
     await this.loadFiles()
   },
+
   methods: {
-    async loadFiles(page = 0) {
+    async loadFiles(page = 0, keyword = '') {
       try {
         this.loading = true
         this.error = null
 
         const fileService = getFileApiService()
-        const response = await fileService.getPaginatedFiles(page, this.pagination.size)
+        let response
+
+        response = await fileService.searchPaginatedFiles(page, this.pagination.size, keyword)
 
         // Map the raw API response to FileMetadata objects
         this.files = response.content.map((fileData) => FileMetadata.fromApiResponse(fileData))
         if (this.files.length == 0 && page != 0) {
-          this.loadFiles(page - 1)
+          this.loadFiles(page - 1, keyword)
           return
         }
 
@@ -153,12 +168,31 @@ export default {
       }
     },
 
+    handleSearchInput() {
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout)
+      }
+
+      this.searchTimeout = setTimeout(() => {
+        this.performSearch()
+      }, 300)
+    },
+
+    async performSearch() {
+      await this.loadFiles(0, this.searchQuery.trim())
+    },
+
+    renameFile(file) {
+      console.log('Rename file:', file.filename)
+      // TODO: Implement rename functionality
+    },
+
     async goToPage(page) {
       const actualPage = page - 1
       if (actualPage < 0 || actualPage > this.pagination.totalPages - 1) {
         return
       }
-      await this.loadFiles(actualPage)
+      await this.loadFiles(actualPage, this.searchQuery.trim())
     },
 
     uploadFile() {
@@ -243,11 +277,47 @@ export default {
   align-items: center;
 }
 
-.page-title {
+.page-title-button {
   font-size: 1.875rem;
   font-weight: 700;
-  color: #1e293b;
+  color: white;
   margin: 0;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.page-title-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+}
+
+.search-section {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .header-actions {

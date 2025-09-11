@@ -20,12 +20,6 @@
             <p>Upload documents, images, and other files</p>
           </div>
 
-          <div class="action-card" @click="createFolder">
-            <div class="action-icon">📂</div>
-            <h3>Create Folder</h3>
-            <p>Organize your files with folders</p>
-          </div>
-
           <div class="action-card" @click="shareFile()">
             <div class="action-icon">👥</div>
             <h3>Shared Files</h3>
@@ -49,6 +43,7 @@
             </div>
             <div class="file-actions">
               <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
+              <button class="action-btn" @click="renameFile(file)" title="Rename">✏️</button>
               <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
               <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
             </div>
@@ -201,10 +196,6 @@ export default {
       this.$router.push('/upload')
     },
 
-    createFolder() {
-      console.log('Create folder clicked')
-    },
-
     shareFile(file = null) {
       if (file) {
         // Sharing a specific file
@@ -233,6 +224,11 @@ export default {
         console.error('Download failed:', error)
         this.error = 'Failed to download file'
       }
+    },
+
+    renameFile(file) {
+      console.log('Rename file:', file.filename)
+      // TODO: Implement rename functionality
     },
 
     async deleteFile(file) {

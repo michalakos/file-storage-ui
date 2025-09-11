@@ -311,6 +311,60 @@ class FileApiService {
   }
 
   /**
+   * Search files by keyword with pagination
+   * @param {number} page - Page number (0-based)
+   * @param {number} size - Number of items per page
+   * @param {string} keyword - Search keyword for filename
+   * @returns {Promise<Object>} Paginated search results
+   */
+  async searchPaginatedFiles(page = 0, size = 5, keyword = '') {
+    try {
+      if (this.debug) {
+        console.log(`Searching files - page: ${page}, size: ${size}, keyword: ${keyword}`)
+      }
+
+      const url = new URL(`${this.baseURL}/api/files/paginated-search`)
+      url.searchParams.append('page', page.toString())
+      url.searchParams.append('size', size.toString())
+      url.searchParams.append('keyword', keyword)
+
+      const response = await this.authService.authenticatedFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `File search failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('File search response:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to search files:', error)
+      throw error
+    }
+  }
+
+  /**
    * Share a file with another user
    * @param {string} fileId - The UUID of the file to share
    * @param {string} username - Username to share with
