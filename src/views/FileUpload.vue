@@ -2,7 +2,7 @@
   <div class="upload-container">
     <header class="upload-header">
       <div class="header-content">
-        <button @click="goBack" class="btn btn-outline">← Back to Dashboard</button>
+        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
         <h1>Upload Files</h1>
       </div>
     </header>
@@ -134,7 +134,7 @@
           <div class="success-icon">🎉</div>
           <h3>Upload Complete!</h3>
           <p>{{ completedUploads }} file(s) uploaded successfully</p>
-          <button @click="goBack" class="btn btn-primary">Return to Dashboard</button>
+          <button @click="goToDashboard" class="btn btn-primary">Return to Dashboard</button>
         </div>
       </div>
     </main>
@@ -294,7 +294,7 @@ export default {
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
 
-    goBack() {
+    goToDashboard() {
       this.$router.push('/dashboard')
     },
   },
@@ -466,6 +466,26 @@ export default {
 .file-progress {
   margin: 0 1rem;
   min-width: 120px;
+}
+
+.page-title-button {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: white;
+  margin: 0;
+  background: linear-gradient(135deg, #10b981, #059669);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.page-title-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669, #047857);
 }
 
 .progress-info {

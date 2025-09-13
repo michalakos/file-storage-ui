@@ -2,25 +2,25 @@
   <div class="files-container">
     <header class="files-header">
       <div class="header-content">
-        <h1 class="page-title-button" @click="goToDashboard">My Files</h1>
+        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
         <div class="search-section">
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search files by name..."
+            placeholder="Search shared files by name..."
             class="search-input"
             @input="handleSearchInput"
           />
         </div>
         <div class="header-actions">
-          <button @click="uploadFile" class="btn btn-primary">📁 Upload Files</button>
+          <button @click="goToMyFiles" class="btn btn-secondary">📁 My Files</button>
         </div>
       </div>
     </header>
 
     <main class="files-main">
       <div v-if="loading && files.length === 0" class="loading-state">
-        <p>Loading files...</p>
+        <p>Loading shared files...</p>
       </div>
 
       <div v-else-if="error" class="error-state">
@@ -30,10 +30,10 @@
 
       <div v-else class="files-content">
         <div v-if="files.length === 0" class="empty-state">
-          <div class="empty-icon">📁</div>
-          <h3>No files yet</h3>
-          <p>Upload your first file to get started</p>
-          <button @click="uploadFile" class="btn btn-primary">Upload Files</button>
+          <div class="empty-icon">👥</div>
+          <h3>No shared files</h3>
+          <p>Files shared with you will appear here</p>
+          <button @click="goToMyFiles" class="btn btn-primary">View My Files</button>
         </div>
 
         <div v-else>
@@ -44,13 +44,11 @@
                 <h4>{{ file.filename }}</h4>
                 <p class="file-meta">
                   {{ file.formattedFileSize }} • {{ file.formattedUploadDate }}
+                  <span class="shared-by">• Shared by {{ file.userDto.displayName }}</span>
                 </p>
               </div>
               <div class="file-actions">
                 <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
-                <button class="action-btn" @click="renameFile(file)" title="Rename">✏️</button>
-                <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
-                <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
               </div>
             </div>
           </div>
@@ -69,7 +67,7 @@
               Page {{ pagination.currentPage }} of {{ pagination.totalPages }} ({{
                 pagination.totalElements
               }}
-              total files)
+              total shared files)
             </div>
 
             <button
@@ -83,20 +81,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Share Modal -->
-    <ShareFileModal
-      :is-open="shareModalOpen"
-      :file="selectedFileToShare"
-      @close="closeShareModal"
-      @shared="handleFileShared"
-    />
-    <RenameFileModal
-      :is-open="renameModalOpen"
-      :file="selectedFileToRename"
-      @close="closeRenameModal"
-      @rename="handleFileRenamed"
-    />
   </div>
 </template>
 
@@ -104,15 +88,9 @@
 import { getAuthService } from '@/services/authService'
 import { getFileApiService } from '@/services/fileService'
 import { FileMetadata } from '@/models/FileMetadata'
-import ShareFileModal from '@/components/ShareFileModal.vue'
-import RenameFileModal from '@/components/RenameFileModal.vue'
 
 export default {
-  name: 'FilesView',
-  components: {
-    ShareFileModal,
-    RenameFileModal,
-  },
+  name: 'SharedFilesView',
   data() {
     return {
       files: [],
@@ -120,16 +98,12 @@ export default {
       searchTimeout: null,
       loading: false,
       error: null,
-      shareModalOpen: false,
-      selectedFileToShare: null,
       pagination: {
         currentPage: 1,
         totalPages: 1,
         totalElements: 0,
         size: 8,
       },
-      renameModalOpen: false,
-      selectedFileToRename: null,
     }
   },
   async mounted() {
@@ -150,9 +124,11 @@ export default {
         this.error = null
 
         const fileService = getFileApiService()
-        let response
-
-        response = await fileService.searchPaginatedFiles(page, this.pagination.size, keyword)
+        const response = await fileService.searchPaginatedSharedFiles(
+          page,
+          this.pagination.size,
+          keyword,
+        )
 
         // Map the raw API response to FileMetadata objects
         this.files = response.content.map((fileData) => FileMetadata.fromApiResponse(fileData))
@@ -168,11 +144,11 @@ export default {
           size: response.size,
         }
 
-        console.log('Files loaded successfully:', this.files)
+        console.log('Shared files loaded successfully:', this.files)
         console.log('Pagination info:', this.pagination)
       } catch (error) {
-        console.error('Failed to load files:', error)
-        this.error = error.message || 'Failed to load files'
+        console.error('Failed to load shared files:', error)
+        this.error = error.message || 'Failed to load shared files'
       } finally {
         this.loading = false
       }
@@ -192,36 +168,6 @@ export default {
       await this.loadFiles(0, this.searchQuery.trim())
     },
 
-    renameFile(file) {
-      this.selectedFileToRename = file
-      this.renameModalOpen = true
-    },
-
-    closeRenameModal() {
-      this.renameModalOpen = false
-      this.selectedFileToRename = null
-    },
-
-    async handleFileRenamed({ fileId, newFilename }) {
-      try {
-        const fileService = getFileApiService()
-        const updatedFile = await fileService.renameFile(fileId, newFilename)
-
-        // Update the file in the local array
-        const fileIndex = this.files.findIndex((f) => f.id === fileId)
-        if (fileIndex !== -1) {
-          this.files[fileIndex] = FileMetadata.fromApiResponse(updatedFile)
-        }
-
-        console.log('File renamed successfully:', updatedFile)
-        this.closeRenameModal() // Close modal on success
-      } catch (error) {
-        console.error('Rename failed:', error)
-        this.error = 'Failed to rename file'
-        throw error // Re-throw so modal can show error
-      }
-    },
-
     async goToPage(page) {
       const actualPage = page - 1
       if (actualPage < 0 || actualPage > this.pagination.totalPages - 1) {
@@ -230,8 +176,8 @@ export default {
       await this.loadFiles(actualPage, this.searchQuery.trim())
     },
 
-    uploadFile() {
-      this.$router.push('/upload')
+    goToMyFiles() {
+      this.$router.push('/files')
     },
 
     async downloadFile(file) {
@@ -241,35 +187,6 @@ export default {
       } catch (error) {
         console.error('Download failed:', error)
         this.error = 'Failed to download file'
-      }
-    },
-
-    shareFile(file) {
-      this.selectedFileToShare = file
-      this.shareModalOpen = true
-    },
-
-    closeShareModal() {
-      this.shareModalOpen = false
-      this.selectedFileToShare = null
-    },
-
-    handleFileShared(shareData) {
-      console.log('File shared successfully:', shareData)
-      // You could show a success message here
-      // For now, just close the modal (already handled by closeShareModal)
-    },
-
-    async deleteFile(file) {
-      try {
-        const fileService = getFileApiService()
-        await fileService.deleteFile(file.id)
-
-        // Reload current page
-        await this.loadFiles(this.pagination.currentPage - 1)
-      } catch (error) {
-        console.error('Delete failed:', error)
-        this.error = 'Failed to delete file'
       }
     },
 
@@ -317,19 +234,19 @@ export default {
   font-weight: 700;
   color: white;
   margin: 0;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, #10b981, #059669);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 }
 
 .page-title-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, #059669, #047857);
 }
 
 .search-section {
@@ -351,8 +268,8 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .header-actions {
@@ -441,6 +358,11 @@ export default {
   margin: 0;
 }
 
+.shared-by {
+  color: #10b981;
+  font-weight: 500;
+}
+
 .file-actions {
   display: flex;
   gap: 0.5rem;
@@ -515,6 +437,15 @@ export default {
 
 .btn-primary:hover {
   background-color: #2563eb;
+}
+
+.btn-secondary {
+  background-color: #64748b;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #475569;
 }
 
 .btn-outline {

@@ -4,13 +4,6 @@ Web app UI for use with file storage project written in Vue 3.
 
 ## TODO:
 
-### Users:
-
-- Implement search in files view
-- Create view for updating user information / password
-- User account delete button
-- Rename files
-
 ### Admin:
 
 - Register new admin

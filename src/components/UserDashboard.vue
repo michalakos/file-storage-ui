@@ -23,7 +23,7 @@
           <div class="action-card" @click="shareFile()">
             <div class="action-icon">👥</div>
             <h3>Shared Files</h3>
-            <p>Access files shared with you</p>
+            <p>View files shared with you</p>
           </div>
         </div>
       </section>
@@ -67,6 +67,12 @@
       @close="closeShareModal"
       @shared="handleFileShared"
     />
+    <RenameFileModal
+      :is-open="renameModalOpen"
+      :file="selectedFileToRename"
+      @close="closeRenameModal"
+      @rename="handleFileRenamed"
+    />
   </div>
 </template>
 
@@ -74,13 +80,16 @@
 import { getAuthService } from '@/services/authService'
 import { getUserApiService } from '@/services/userService'
 import { getFileApiService } from '@/services/fileService'
+import { FileMetadata } from '@/models/FileMetadata'
 import ShareFileModal from '@/components/ShareFileModal.vue'
+import RenameFileModal from '@/components/RenameFileModal.vue'
 
 export default {
   name: 'UserDashboard',
 
   components: {
     ShareFileModal,
+    RenameFileModal,
   },
 
   data() {
@@ -93,6 +102,8 @@ export default {
       totalStorage: '0',
       shareModalOpen: false,
       selectedFileToShare: null,
+      renameModalOpen: false,
+      selectedFileToRename: null,
     }
   },
 
@@ -227,8 +238,33 @@ export default {
     },
 
     renameFile(file) {
-      console.log('Rename file:', file.filename)
-      // TODO: Implement rename functionality
+      this.selectedFileToRename = file
+      this.renameModalOpen = true
+    },
+
+    closeRenameModal() {
+      this.renameModalOpen = false
+      this.selectedFileToRename = null
+    },
+
+    async handleFileRenamed({ fileId, newFilename }) {
+      try {
+        const fileService = getFileApiService()
+        const updatedFile = await fileService.renameFile(fileId, newFilename)
+
+        // Update the file in the recentFiles array
+        const fileIndex = this.recentFiles.findIndex((f) => f.id === fileId)
+        if (fileIndex !== -1) {
+          this.recentFiles[fileIndex] = FileMetadata.fromApiResponse(updatedFile)
+        }
+
+        console.log('File renamed successfully:', updatedFile)
+        this.closeRenameModal() // Close modal on success
+      } catch (error) {
+        console.error('Rename failed:', error)
+        this.error = 'Failed to rename file'
+        throw error // Re-throw so modal can show error
+      }
     },
 
     async deleteFile(file) {

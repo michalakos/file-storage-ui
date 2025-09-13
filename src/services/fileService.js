@@ -365,6 +365,114 @@ class FileApiService {
   }
 
   /**
+   * Search shared files by keyword with pagination
+   * @param {number} page - Page number (0-based)
+   * @param {number} size - Number of items per page
+   * @param {string} keyword - Search keyword for filename
+   * @returns {Promise<Object>} Paginated search results
+   */
+  async searchPaginatedSharedFiles(page = 0, size = 5, keyword = '') {
+    try {
+      if (this.debug) {
+        console.log(`Searching shared files - page: ${page}, size: ${size}, keyword: ${keyword}`)
+      }
+
+      const url = new URL(`${this.baseURL}/api/files/paginated-search-shared`)
+      url.searchParams.append('page', page.toString())
+      url.searchParams.append('size', size.toString())
+      url.searchParams.append('keyword', keyword)
+
+      const response = await this.authService.authenticatedFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Shared file search failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('Shared file search response:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to search shared files:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Rename a file
+   * @param {string} fileId - The UUID of the file to rename
+   * @param {string} newFileName - The new filename
+   * @returns {Promise<Object>} Updated file metadata
+   */
+  async renameFile(fileId, newFileName) {
+    try {
+      if (this.debug) {
+        console.log(`Renaming file ${fileId} to: ${newFileName}`)
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/files/${fileId}/rename`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            newFileName,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `File rename failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('File renamed successfully:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to rename file:', error)
+      throw error
+    }
+  }
+
+  /**
    * Share a file with another user
    * @param {string} fileId - The UUID of the file to share
    * @param {string} username - Username to share with
