@@ -85,7 +85,6 @@
 import { getAuthService } from '@/services/authService'
 import { getAdminApiService } from '@/services/adminService'
 import { getUserApiService } from '@/services/userService'
-import { getFileApiService } from '@/services/fileService'
 
 export default {
   name: 'AdminDashboard',
