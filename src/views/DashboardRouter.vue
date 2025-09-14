@@ -1,7 +1,10 @@
 <template>
   <div>
-    <AdminDashboard v-if="isAdmin" />
-    <UserDashboard v-else />
+    <AdminDashboard
+      v-if="isAdmin && adminViewMode === 'admin'"
+      @switchToUser="setAdminViewMode('user')"
+    />
+    <UserDashboard v-else @switchToAdmin="setAdminViewMode('admin')" />
   </div>
 </template>
 
@@ -20,6 +23,19 @@ export default {
   data() {
     return {
       isAdmin: false,
+      adminViewMode: 'admin',
+    }
+  },
+
+  created() {
+    // Handle direct navigation to specific dashboard views
+    const currentRoute = this.$route.path
+    if (currentRoute.includes('/admin')) {
+      this.adminViewMode = 'admin'
+      sessionStorage.setItem('adminViewMode', 'admin')
+    } else if (currentRoute.includes('/user')) {
+      this.adminViewMode = 'user'
+      sessionStorage.setItem('adminViewMode', 'user')
     }
   },
 
@@ -32,6 +48,14 @@ export default {
     }
 
     await this.checkUserRole()
+
+    // Check for stored admin view mode preference
+    if (this.isAdmin) {
+      const storedViewMode = sessionStorage.getItem('adminViewMode')
+      if (storedViewMode && (storedViewMode === 'admin' || storedViewMode === 'user')) {
+        this.adminViewMode = storedViewMode
+      }
+    }
   },
 
   methods: {
@@ -48,6 +72,11 @@ export default {
         console.error('Failed to determine user role:', error)
         this.isAdmin = false
       }
+    },
+
+    setAdminViewMode(mode) {
+      this.adminViewMode = mode
+      sessionStorage.setItem('adminViewMode', mode)
     },
 
     decodeJWT(token) {

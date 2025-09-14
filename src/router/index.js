@@ -64,6 +64,14 @@ const routes = [
     component: () => import('@/views/AdminLogs.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
   },
+  {
+    path: '/dashboard/user',
+    component: () => import('@/components/UserDashboard.vue'),
+  },
+  {
+    path: '/dashboard/admin',
+    component: () => import('@/components/AdminDashboard.vue'),
+  },
 ]
 
 const router = createRouter({

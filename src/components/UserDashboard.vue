@@ -4,7 +4,11 @@
       <div class="header-content">
         <h1 class="app-title">File Storage</h1>
         <div class="user-info">
+          <span class="admin-badge" v-if="isUserAdmin">Admin</span>
           <span class="welcome-text">Welcome back, {{ this.userData?.username ?? 'user' }}!</span>
+          <button @click="goToAdminDashboard" v-if="isUserAdmin" class="btn btn-primary">
+            Admin Panel
+          </button>
           <button @click="handleLogout" class="btn btn-secondary">Logout</button>
         </div>
       </div>
@@ -94,6 +98,7 @@ export default {
 
   data() {
     return {
+      isUserAdmin: false,
       userData: null,
       loading: false,
       error: null,
@@ -115,6 +120,7 @@ export default {
       return
     }
 
+    await this.checkIfAdmin()
     await this.loadUserData()
     await this.refreshData()
   },
@@ -307,6 +313,15 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+
+    async checkIfAdmin() {
+      const authService = getAuthService()
+      this.isUserAdmin = authService.isAdmin()
+    },
+
+    goToAdminDashboard() {
+      this.$emit('switchToAdmin')
     },
 
     handleLogout() {

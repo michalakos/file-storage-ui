@@ -6,6 +6,7 @@
         <div class="user-info">
           <span class="admin-badge">Admin</span>
           <span class="welcome-text">Welcome, {{ this.userData?.username ?? 'admin' }}!</span>
+          <button @click="goToUserDashboard" class="btn btn-primary">User View</button>
           <button @click="handleLogout" class="btn btn-secondary">Logout</button>
         </div>
       </div>
@@ -367,6 +368,10 @@ export default {
 
     suspendUser(user) {
       console.log('Suspend user:', user.name)
+    },
+
+    goToUserDashboard() {
+      this.$emit('switchToUser')
     },
 
     handleLogout() {
