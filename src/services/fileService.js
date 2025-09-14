@@ -218,7 +218,7 @@ class FileApiService {
 
   /**
    * Delete a file by ID
-   * @param {string} fileId - The UUID of the file to download
+   * @param {string} fileId - The UUID of the file to delete
    * @returns {Promise<void>}
    */
   async deleteFile(fileId) {

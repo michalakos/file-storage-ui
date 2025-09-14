@@ -38,14 +38,29 @@
 
       <div v-else class="logs-content">
         <div class="logs-list">
-          <div v-for="log in logs" :key="log.id" class="log-item">
+          <div
+            v-for="log in logs"
+            :key="log.id"
+            class="log-item"
+            :class="[log.type, { expandable: isLogExpandable(log) }]"
+            @click="isLogExpandable(log) ? toggleLogExpansion(log.id) : null"
+          >
             <div class="log-icon" :class="log.type">
               {{ getLogIcon(log.type) }}
             </div>
             <div class="log-content">
               <h4>{{ log.level }} - {{ log.className }}</h4>
-              <p class="log-desc">{{ log.message }}</p>
+              <p
+                class="log-desc"
+                :class="{ expanded: isLogExpanded(log.id) }"
+                style="white-space: pre-line"
+              >
+                {{ log.message }}
+              </p>
               <p class="log-time">{{ formatTimestamp(log.timestamp) }}</p>
+              <div class="expand-indicator" v-if="isLogExpandable(log)">
+                {{ isLogExpanded(log.id) ? '▲ Click to collapse' : '▼ Click to expand' }}
+              </div>
             </div>
             <div class="log-status">
               <span class="status-badge" :class="log.type">
@@ -67,8 +82,10 @@ export default {
   name: 'AdminLogs',
   data() {
     return {
+      maxLogSize: 200,
       logs: [],
       logCount: 10,
+      expandedLogs: new Set(),
       loading: false,
       error: null,
       refreshInterval: null,
@@ -106,6 +123,34 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+
+    isLogExpandable(log) {
+      return log.message.length > this.maxLogSize || log.message.includes('\n')
+    },
+
+    toggleLogExpansion(logId) {
+      const log = this.logs.find((l) => l.id === logId)
+
+      if (log && log.message.length <= this.maxLogSize && !log.message.includes('\n')) {
+        return
+      }
+
+      if (this.expandedLogs.has(logId)) {
+        this.expandedLogs.delete(logId)
+      } else {
+        this.expandedLogs.add(logId)
+      }
+
+      if (this.expandedLogs.size == 0) {
+        this.startAutoRefresh()
+      } else {
+        this.stopAutoRefresh()
+      }
+    },
+
+    isLogExpanded(logId) {
+      return this.expandedLogs.has(logId)
     },
 
     parseLogsToObjects(logString) {
@@ -238,6 +283,7 @@ export default {
   },
 }
 </script>
+
 <style scoped>
 .admin-logs {
   min-height: 100vh;
@@ -302,6 +348,52 @@ export default {
 .log-slider {
   flex: 1;
   max-width: 300px;
+}
+
+.log-desc {
+  margin: 0 0 0.5rem 0;
+  color: #4a5568;
+  line-height: 1.5;
+  word-break: break-word;
+  max-height: 3.6em; /* Roughly 3 lines */
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.log-desc.expanded {
+  max-height: none;
+}
+
+.expand-indicator {
+  font-size: 0.75rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  user-select: none;
+}
+
+.log-content {
+  flex: 1;
+}
+
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 8px;
+  border-left: 4px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.log-item.expandable {
+  cursor: pointer;
+}
+
+.log-item.expandable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(68, 29, 120, 0.2);
 }
 
 .logs-content {

@@ -313,6 +313,174 @@ class UserApiService {
       throw error
     }
   }
+
+  /**
+   * Delete a user by ID
+   * @param {string} userId - The UUID of the user
+   * @returns {Promise<void>}
+   */
+  async deleteUser(userId) {
+    try {
+      if (this.debug) {
+        console.log('Deleting user:', userId)
+      }
+
+      const url = `${this.baseURL}/api/admin/users/${userId}`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Deletion failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      if (this.debug) {
+        console.log('User deleted successfully:', userId)
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Ban a user by ID
+   * @param {string} userId - The UUID of the user
+   * @returns {Promise<void>}
+   */
+  async banUser(userId) {
+    try {
+      if (this.debug) {
+        console.log('Banning user:', userId)
+      }
+
+      const url = `${this.baseURL}/api/admin/ban/${userId}`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Ban failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      if (this.debug) {
+        console.log('User banned successfully:', userId)
+      }
+    } catch (error) {
+      console.error('Failed to ban user:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Unban a user by ID
+   * @param {string} userId - The UUID of the user
+   * @returns {Promise<void>}
+   */
+  async unbanUser(userId) {
+    try {
+      if (this.debug) {
+        console.log('Unbanning user:', userId)
+      }
+
+      const url = `${this.baseURL}/api/admin/unban/${userId}`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Unban failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      if (this.debug) {
+        console.log('User unbanned successfully:', userId)
+      }
+    } catch (error) {
+      console.error('Failed to unban user:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Change the role of a user by ID
+   * @param {string} userId - The UUID of the user
+   * @returns {Promise<void>}
+   */
+  async changeRole(userId) {
+    try {
+      if (this.debug) {
+        console.log('Changing role for user:', userId)
+      }
+
+      const url = `${this.baseURL}/api/admin/role/${userId}`
+
+      const response = await this.authService.authenticatedFetch(url, {
+        method: 'POST',
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Role change failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      if (this.debug) {
+        console.log('User role changed successfully:', userId)
+      }
+    } catch (error) {
+      console.error('Failed to change role for user:', error)
+      throw error
+    }
+  }
 }
 
 // Create a singleton instance

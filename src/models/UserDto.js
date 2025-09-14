@@ -3,6 +3,8 @@ export class UserDto {
     this.id = data.id || null
     this.username = data.username || ''
     this.email = data.email || ''
+    this.banned = data.isBanned || false
+    this.isAdmin = data.isAdmin || false
   }
 
   get displayName() {

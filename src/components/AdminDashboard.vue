@@ -200,6 +200,7 @@ export default {
         this.error = null
         const fileApiService = getFileApiService()
         const logs = await fileApiService.getLogs(lines)
+        console.log('check this out', logs)
         this.recentActivity = this.parseLogsToActivity(logs)
         console.log('System logs loaded successfully:', this.recentActivity)
       } catch (error) {

@@ -131,6 +131,8 @@ class AuthService {
 
   // Logout user
   logout() {
+    // Clear admin view mode preference
+    sessionStorage.removeItem('adminViewMode')
     this.store.removeToken()
   }
 

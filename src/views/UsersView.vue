@@ -33,15 +33,36 @@
 
         <div v-else>
           <div class="users-grid">
-            <div v-for="user in users" :key="user.id" class="user-item">
+            <div v-for="user in sortedUsers" :key="user.id" class="user-item">
               <div class="user-icon">👤</div>
               <div class="user-info">
-                <h4>{{ user.username }}</h4>
+                <h4>
+                  {{ user.username }}
+                  <span v-if="user.banned" class="banned-badge">BANNED</span>
+                  <span v-if="user.isAdmin" class="admin-badge">ADMIN</span>
+                  <span v-if="isCurrentUser(user)" class="current-user-badge">YOU</span>
+                </h4>
                 <p class="user-data">{{ user.username }} • {{ user.email }}</p>
               </div>
-              <div class="user-actions">
-                <button class="action-btn" @click="banUser(user)" title="Ban">🚫</button>
-                <button class="action-btn" @click="unbanUser(user)" title="Unban">✅</button>
+              <div class="user-actions" v-if="!isCurrentUser(user)">
+                <button
+                  class="action-btn"
+                  @click="banUser(user)"
+                  :disabled="user.banned"
+                  :class="{ disabled: user.banned }"
+                  title="Ban"
+                >
+                  🚫
+                </button>
+                <button
+                  class="action-btn"
+                  @click="unbanUser(user)"
+                  :disabled="!user.banned"
+                  :class="{ disabled: !user.banned }"
+                  title="Unban"
+                >
+                  ✅
+                </button>
                 <button class="action-btn" @click="changeRole(user)" title="Change Role">🔄</button>
                 <button class="action-btn" @click="deleteUser(user)" title="Delete">🗑️</button>
               </div>
@@ -101,6 +122,33 @@ export default {
       },
     }
   },
+
+  computed: {
+    sortedUsers() {
+      const authService = getAuthService()
+      const currentToken = authService.getToken()
+      let currentUserId = null
+
+      if (currentToken) {
+        try {
+          const payload = JSON.parse(atob(currentToken.split('.')[1]))
+          currentUserId = payload.userId || payload.sub // Adjust based on your JWT structure
+        } catch (error) {
+          console.error('Error decoding token:', error)
+        }
+      }
+
+      return [...this.users].sort((a, b) => {
+        const aIsCurrent = a.id === currentUserId || a.username === currentUserId
+        const bIsCurrent = b.id === currentUserId || b.username === currentUserId
+
+        if (aIsCurrent && !bIsCurrent) return -1
+        if (!aIsCurrent && bIsCurrent) return 1
+        return 0
+      })
+    },
+  },
+
   async mounted() {
     const authService = getAuthService()
 
@@ -147,6 +195,21 @@ export default {
       }
     },
 
+    isCurrentUser(user) {
+      const authService = getAuthService()
+      const currentToken = authService.getToken()
+      if (currentToken) {
+        try {
+          const payload = JSON.parse(atob(currentToken.split('.')[1]))
+          return payload.userId === user.id || payload.sub === user.username // Adjust based on your JWT structure
+        } catch (error) {
+          console.error('Error decoding token:', error)
+          return false
+        }
+      }
+      return false
+    },
+
     handleSearchInput() {
       if (this.searchTimeout) {
         clearTimeout(this.searchTimeout)
@@ -162,19 +225,47 @@ export default {
     },
 
     async banUser(user) {
-      console.log('banning user', user)
+      console.log('Ban user: ', user)
+      try {
+        const userService = getUserApiService()
+        await userService.banUser(user.id)
+        await this.loadUsers()
+      } catch (error) {
+        console.error('Ban failed:', error)
+      }
     },
 
     async unbanUser(user) {
-      console.log('unbanning user', user)
+      console.log('Unban user: ', user)
+      try {
+        const userService = getUserApiService()
+        await userService.unbanUser(user.id)
+        await this.loadUsers()
+      } catch (error) {
+        console.error('Unban failed:', error)
+      }
     },
 
     async changeRole(user) {
-      console.log('changing role for user', user)
+      console.log('Changing role of user: ', user)
+      try {
+        const userService = getUserApiService()
+        await userService.changeRole(user.id)
+        await this.loadUsers()
+      } catch (error) {
+        console.error('Role change failed:', error)
+      }
     },
 
     async deleteUser(user) {
-      console.log('deleting user', user)
+      console.log('Delete user: ', user)
+      try {
+        const userService = getUserApiService()
+        await userService.deleteUser(user.id)
+        await this.loadUsers()
+      } catch (error) {
+        console.error('Delete failed:', error)
+      }
     },
 
     async goToPage(page) {
@@ -370,6 +461,48 @@ export default {
 
 .action-btn:hover {
   background-color: #f1f5f9;
+}
+
+.action-btn:disabled,
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.action-btn:disabled:hover,
+.action-btn.disabled:hover {
+  transform: none;
+  background: inherit;
+}
+
+.admin-badge {
+  background: #667eea;
+  color: white;
+  font-size: 0.6em;
+  padding: 0.2em 0.5em;
+  border-radius: 12px;
+  font-weight: bold;
+  margin-left: 0.5em;
+}
+
+.banned-badge {
+  background: #f56565;
+  color: white;
+  font-size: 0.6em;
+  padding: 0.2em 0.5em;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.current-user-badge {
+  background: #48bb78;
+  color: white;
+  font-size: 0.6em;
+  padding: 0.2em 0.5em;
+  border-radius: 12px;
+  font-weight: bold;
+  margin-left: 0.5em;
 }
 
 .pagination {
