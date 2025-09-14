@@ -16,20 +16,20 @@ class AuthService {
     return useAuthStore()
   }
 
-  // Register new user
-  async register(authRequest) {
+  // Add this method to your AuthService class
+  async makeUnauthenticatedRequest(url, options = {}) {
     try {
-      const response = await fetch(`${this.baseURL}/api/auth/register`, {
-        method: 'POST',
+      const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
+          ...options.headers,
         },
-        body: JSON.stringify(authRequest),
+        ...options,
       })
 
       if (!response.ok) {
         const errorText = await response.text()
-        let message = `Login failed: ${response.status}`
+        let message = `Request failed: ${response.status}`
         try {
           const json = JSON.parse(errorText)
           message = json.message || message
@@ -42,9 +42,23 @@ class AuthService {
         throw error
       }
 
-      const jwtResponse = await response.json()
+      return response.json()
+    } catch (error) {
+      console.error('Unauthenticated request error:', error)
+      throw error
+    }
+  }
 
-      // Store the JWT token
+  async register(authRequest) {
+    try {
+      const jwtResponse = await this.makeUnauthenticatedRequest(
+        `${this.baseURL}/api/auth/register`,
+        {
+          method: 'POST',
+          body: JSON.stringify(authRequest),
+        },
+      )
+
       if (jwtResponse.token) {
         this.store.setToken(jwtResponse.token)
       }
@@ -56,38 +70,16 @@ class AuthService {
     }
   }
 
-  // Login user
   async login(authRequest) {
     try {
-      const response = await fetch(`${this.baseURL}/api/auth/login`, {
+      const jwtResponse = await this.makeUnauthenticatedRequest(`${this.baseURL}/api/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           username: authRequest.username,
           password: authRequest.password,
         }),
       })
 
-      if (!response.ok) {
-        const errorText = await response.text()
-        let message = `Login failed: ${response.status}`
-        try {
-          const json = JSON.parse(errorText)
-          message = json.message || message
-        } catch {
-          message = errorText || message
-        }
-
-        const error = new Error(message)
-        error.status = response.status
-        throw error
-      }
-
-      const jwtResponse = await response.json()
-
-      // Store the JWT token
       if (jwtResponse.token) {
         this.store.setToken(jwtResponse.token)
       }
