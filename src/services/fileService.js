@@ -670,10 +670,6 @@ class FileApiService {
 
       const data = await response.text()
 
-      if (this.debug) {
-        console.log('System logs:', data)
-      }
-
       return data
     } catch (error) {
       console.error('Failed to load system logs:', error)

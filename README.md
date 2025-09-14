@@ -11,7 +11,6 @@ Web app UI for use with file storage project written in Vue 3.
 - Unban user
 - Change user role
 - Delete user
-- View with all users and quick action buttons
-- Implement search in view
-- Storage view in home page
-- Logs view
+- Make ban/unban buttons grey if not applicable
+
+### Fix styling

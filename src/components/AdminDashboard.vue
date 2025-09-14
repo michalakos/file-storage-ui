@@ -93,58 +93,8 @@ export default {
       totalUsers: 0,
       totalFiles: 0,
       totalStorage: '0 GB',
-      recentActivity: [
-        {
-          id: 1,
-          type: 'user',
-          title: 'New user registered',
-          description: 'john.doe@example.com created an account',
-          timestamp: '5 minutes ago',
-          status: 'success',
-        },
-        {
-          id: 2,
-          type: 'system',
-          title: 'Storage threshold reached',
-          description: 'Server storage is at 85% capacity',
-          timestamp: '1 hour ago',
-          status: 'warning',
-        },
-        {
-          id: 3,
-          type: 'security',
-          title: 'Failed login attempts',
-          description: 'Multiple failed login attempts detected',
-          timestamp: '2 hours ago',
-          status: 'error',
-        },
-      ],
-      recentUsers: [
-        {
-          id: 1,
-          name: 'John Doe',
-          email: 'john.doe@example.com',
-          role: 'user',
-          storageUsed: '2.1 GB',
-          lastActive: '2 hours ago',
-        },
-        {
-          id: 2,
-          name: 'Jane Smith',
-          email: 'jane.smith@example.com',
-          role: 'admin',
-          storageUsed: '5.8 GB',
-          lastActive: '1 day ago',
-        },
-        {
-          id: 3,
-          name: 'Mike Johnson',
-          email: 'mike.j@example.com',
-          role: 'user',
-          storageUsed: '1.2 GB',
-          lastActive: '3 days ago',
-        },
-      ],
+      recentActivity: [],
+      refreshInterval: null,
     }
   },
 
@@ -157,11 +107,16 @@ export default {
     }
 
     // Load admin data
+    this.startAutoRefresh()
     await this.loadAdminData()
     await this.getTotalFiles()
     await this.getTotalUsers()
     await this.getTotalStorage()
     await this.getLogs()
+  },
+
+  beforeUnmount() {
+    this.stopAutoRefresh()
   },
 
   methods: {
@@ -237,16 +192,15 @@ export default {
       }
     },
 
-    async getLogs(lines = 10) {
+    async getLogs(lines = 3) {
       console.log('Fetching system logs')
       try {
         this.loading = true
         this.error = null
-
         const fileApiService = getFileApiService()
         const logs = await fileApiService.getLogs(lines)
-
-        console.log('System lgos loaded successfully:', logs)
+        this.recentActivity = this.parseLogsToActivity(logs)
+        console.log('System logs loaded successfully:', this.recentActivity)
       } catch (error) {
         console.error('Failed to load system logs:', error)
         this.error = error.message
@@ -255,12 +209,111 @@ export default {
       }
     },
 
+    parseLogsToActivity(logString) {
+      const lines = logString.split('\n').filter((line) => line.trim())
+      const logEntries = []
+      let currentLog = null
+
+      for (let i = 0; i < lines.length && logEntries.length < 3; i++) {
+        const line = lines[i]
+        const logMatch = line.match(
+          /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) \[([^\]]+)\] (\w+)\s+(.+?) - (.+)$/,
+        )
+
+        if (logMatch) {
+          // Start of new log entry
+          if (currentLog) {
+            logEntries.push(this.createActivityFromLog(currentLog))
+          }
+
+          const [, timestamp, , level, className, message] = logMatch
+          currentLog = {
+            timestamp,
+            level,
+            className,
+            message: message.trim(),
+          }
+        } else if (currentLog && line.trim()) {
+          // Continuation of previous log entry
+          currentLog.message += ' ' + line.trim()
+        }
+      }
+
+      // Don't forget the last log entry
+      if (currentLog && logEntries.length < 3) {
+        logEntries.push(this.createActivityFromLog(currentLog))
+      }
+
+      return logEntries
+    },
+
+    createActivityFromLog(log) {
+      const logLevel = log.level.toLowerCase()
+      return {
+        id: Date.now() + Math.random(),
+        type: this.mapLogLevelToType(logLevel),
+        title: `${log.level} - ${this.getShortClassName(log.className)}`,
+        description: this.truncateMessage(log.message),
+        timestamp: this.formatTimestamp(log.timestamp),
+        status: this.mapLogLevelToStatus(logLevel),
+      }
+    },
+
+    getShortClassName(className) {
+      if (className.includes('.')) {
+        return className.split('.').pop()
+      }
+      return className
+    },
+
+    truncateMessage(message) {
+      if (message.length > 100) {
+        return message.substring(0, 100) + '...'
+      }
+      return message
+    },
+
+    mapLogLevelToType(level) {
+      const mapping = {
+        error: 'error',
+        warn: 'warning',
+        info: 'info',
+        debug: 'debug',
+        trace: 'debug',
+      }
+      return mapping[level] || 'info'
+    },
+
+    mapLogLevelToStatus(level) {
+      const mapping = {
+        error: 'error',
+        warn: 'warning',
+        info: 'success',
+        debug: 'info',
+        trace: 'info',
+      }
+      return mapping[level] || 'info'
+    },
+
+    formatTimestamp(timestamp) {
+      const logTime = new Date(timestamp)
+      const now = new Date()
+      const diffMs = now - logTime
+      const diffMins = Math.floor(diffMs / (1000 * 60))
+      const diffHours = Math.floor(diffMins / 60)
+
+      if (diffMins < 1) return 'Just now'
+      if (diffMins < 60) return `${diffMins} minutes ago`
+      if (diffHours < 24) return `${diffHours} hours ago`
+      return logTime.toLocaleDateString()
+    },
+
     getActivityIcon(type) {
       const icons = {
-        user: '👤',
-        system: '⚙️',
-        security: '🔒',
-        file: '📁',
+        error: '🚨',
+        warning: '⚠️',
+        info: 'ℹ️',
+        debug: '🔍',
       }
       return icons[type] || '📋'
     },
@@ -273,6 +326,19 @@ export default {
       const i = Math.floor(Math.log(bytes) / Math.log(k))
 
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    },
+
+    startAutoRefresh() {
+      this.refreshInterval = setInterval(() => {
+        this.getLogs(3)
+      }, 5000)
+    },
+
+    stopAutoRefresh() {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval)
+        this.refreshInterval = null
+      }
     },
 
     manageUsers() {
