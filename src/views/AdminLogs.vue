@@ -76,7 +76,7 @@
 
 <script>
 import { getAuthService } from '@/services/authService'
-import { getFileApiService } from '@/services/fileService'
+import { getAdminApiService } from '@/services/adminService'
 
 export default {
   name: 'AdminLogs',
@@ -114,8 +114,8 @@ export default {
       try {
         this.loading = true
         this.error = null
-        const fileApiService = getFileApiService()
-        const logsString = await fileApiService.getLogs(this.logCount)
+        const adminService = getAdminApiService()
+        const logsString = await adminService.getLogs(this.logCount)
         this.logs = this.parseLogsToObjects(logsString)
       } catch (error) {
         console.error('Failed to load logs:', error)

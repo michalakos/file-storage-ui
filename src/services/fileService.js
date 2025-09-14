@@ -51,18 +51,6 @@ class FileApiService extends BaseApiService {
     })
   }
 
-  async getTotalFiles() {
-    return this.makeRequest('/api/admin/files/count', { method: 'GET' })
-  }
-
-  async getTotalStorage() {
-    return this.makeRequest('/api/admin/storage', { method: 'GET' })
-  }
-
-  async getLogs(lines = 10) {
-    return this.makeRequest(`/api/admin/logs/${lines}`, { method: 'GET' })
-  }
-
   /**
    * Upload a file to the server
    * @param {File} file - The file object to upload

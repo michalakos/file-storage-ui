@@ -102,7 +102,7 @@
 
 <script>
 import { getAuthService } from '@/services/authService'
-import { getUserApiService } from '@/services/userService'
+import { getAdminApiService } from '@/services/adminService'
 import { UserDto } from '@/models/UserDto'
 
 export default {
@@ -166,10 +166,10 @@ export default {
         this.loading = true
         this.error = null
 
-        const userService = getUserApiService()
+        const adminService = getAdminApiService()
         let response
 
-        response = await userService.searchUsersPaginated(page, this.pagination.size, keyword)
+        response = await adminService.searchUsersPaginated(page, this.pagination.size, keyword)
 
         // Map the raw API response to FileMetadata objects
         this.users = response.content.map((userData) => UserDto.fromApiResponse(userData))
@@ -227,8 +227,8 @@ export default {
     async banUser(user) {
       console.log('Ban user: ', user)
       try {
-        const userService = getUserApiService()
-        await userService.banUser(user.id)
+        const adminService = getAdminApiService()
+        await adminService.banUser(user.id)
         await this.loadUsers()
       } catch (error) {
         console.error('Ban failed:', error)
@@ -238,8 +238,8 @@ export default {
     async unbanUser(user) {
       console.log('Unban user: ', user)
       try {
-        const userService = getUserApiService()
-        await userService.unbanUser(user.id)
+        const adminService = getAdminApiService()
+        await adminService.unbanUser(user.id)
         await this.loadUsers()
       } catch (error) {
         console.error('Unban failed:', error)
@@ -249,8 +249,8 @@ export default {
     async changeRole(user) {
       console.log('Changing role of user: ', user)
       try {
-        const userService = getUserApiService()
-        await userService.changeRole(user.id)
+        const adminService = getAdminApiService()
+        await adminService.changeRole(user.id)
         await this.loadUsers()
       } catch (error) {
         console.error('Role change failed:', error)
@@ -260,8 +260,8 @@ export default {
     async deleteUser(user) {
       console.log('Delete user: ', user)
       try {
-        const userService = getUserApiService()
-        await userService.deleteUser(user.id)
+        const adminService = getAdminApiService()
+        await adminService.deleteUser(user.id)
         await this.loadUsers()
       } catch (error) {
         console.error('Delete failed:', error)

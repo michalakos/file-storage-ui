@@ -83,6 +83,7 @@
 
 <script>
 import { getAuthService } from '@/services/authService'
+import { getAdminApiService } from '@/services/adminService'
 import { getUserApiService } from '@/services/userService'
 import { getFileApiService } from '@/services/fileService'
 
@@ -144,8 +145,8 @@ export default {
         this.loading = true
         this.error = null
 
-        const fileApiService = getFileApiService()
-        this.totalFiles = await fileApiService.getTotalFiles()
+        const adminService = getAdminApiService()
+        this.totalFiles = await adminService.getTotalFiles()
 
         console.log('Total number of files loaded successfully:', this.totalFiles)
       } catch (error) {
@@ -162,8 +163,8 @@ export default {
         this.loading = true
         this.error = null
 
-        const userApiService = getUserApiService()
-        this.totalUsers = await userApiService.getTotalUsers()
+        const adminApiService = getAdminApiService()
+        this.totalUsers = await adminApiService.getTotalUsers()
 
         console.log('Total number of users loaded successfully:', this.totalUsers)
       } catch (error) {
@@ -180,8 +181,8 @@ export default {
         this.loading = true
         this.error = null
 
-        const fileApiService = getFileApiService()
-        const usedStorage = await fileApiService.getTotalStorage()
+        const adminService = getAdminApiService()
+        const usedStorage = await adminService.getTotalStorage()
         this.totalStorage = this.formatFileSize(usedStorage)
 
         console.log('Total used storage loaded successfully:', this.totalStorage)
@@ -198,9 +199,8 @@ export default {
       try {
         this.loading = true
         this.error = null
-        const fileApiService = getFileApiService()
-        const logs = await fileApiService.getLogs(lines)
-        console.log('check this out', logs)
+        const adminService = getAdminApiService()
+        const logs = await adminService.getLogs(lines)
         this.recentActivity = this.parseLogsToActivity(logs)
         console.log('System logs loaded successfully:', this.recentActivity)
       } catch (error) {

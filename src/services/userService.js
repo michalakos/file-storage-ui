@@ -24,34 +24,6 @@ class UserApiService extends BaseApiService {
   async searchUsers(keyword) {
     return this.makeRequest('/api/users', { method: 'GET' }, { keyword })
   }
-
-  async searchUsersPaginated(page = 0, size = 5, keyword = '') {
-    return this.makeRequest(
-      '/api/admin/users/search-paginated',
-      { method: 'GET' },
-      { page, size, keyword },
-    )
-  }
-
-  async getTotalUsers() {
-    return this.makeRequest('/api/admin/users/count', { method: 'GET' })
-  }
-
-  async deleteUser(userId) {
-    return this.makeRequest(`/api/admin/users/${userId}`, { method: 'DELETE' })
-  }
-
-  async banUser(userId) {
-    return this.makeRequest(`/api/admin/ban/${userId}`, { method: 'POST' })
-  }
-
-  async unbanUser(userId) {
-    return this.makeRequest(`/api/admin/unban/${userId}`, { method: 'POST' })
-  }
-
-  async changeRole(userId) {
-    return this.makeRequest(`/api/admin/role/${userId}`, { method: 'POST' })
-  }
 }
 
 // Create a singleton instance
