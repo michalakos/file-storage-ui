@@ -209,58 +209,111 @@ class UserApiService {
       throw error
     }
   }
+
+  /**
+   * Search for users by keyword with pagination
+   * @param {number} page - Page number (0-based)
+   * @param {number} size - Number of items per page
+   * @param {string} keyword - Search keyword for username/email
+   * @returns {Promise<Object>} Paginated search results
+   */
+  async searchUsersPaginated(page = 0, size = 5, keyword = '') {
+    try {
+      if (this.debug) {
+        console.log(`Searching users - page: ${page}, size: ${size}, keyword: ${keyword}`)
+      }
+
+      const url = new URL(`${this.baseURL}/api/admin/users/search-paginated`)
+      url.searchParams.append('page', page.toString())
+      url.searchParams.append('size', size.toString())
+      url.searchParams.append('keyword', keyword)
+
+      const response = await this.authService.authenticatedFetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `User search failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('User search response:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to search users:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get the total number of users stored in the system.
+   *
+   * @returns {Promise<Object>} number of users
+   */
+  async getTotalUsers() {
+    try {
+      if (this.debug) {
+        console.log('Fetching total number of users...')
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/admin/users/count`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Total number of users fetch failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('Total number of users:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to load total number of users:', error)
+      throw error
+    }
+  }
 }
-
-//   /**
-//    * Update user profile information
-//    * @param {Object} userData - Updated user data
-//    * @returns {Promise<Object>} Updated user data
-//    */
-//   async updateUserProfile(userData) {
-//     try {
-//       if (this.debug) {
-//         console.log('Updating user profile:', userData)
-//       }
-
-//       const response = await this.authService.authenticatedFetch(
-//         `${this.baseURL}/api/users/profile`,
-//         {
-//           method: 'PUT',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify(userData),
-//         },
-//       )
-
-//       if (!response.ok) {
-//         const errorText = await response.text()
-//         let message = `Profile update failed: ${response.status}`
-
-//         try {
-//           const json = JSON.parse(errorText)
-//           message = json.message || message
-//         } catch {
-//           message = errorText || message
-//         }
-
-//         const error = new Error(message)
-//         error.status = response.status
-//         throw error
-//       }
-
-//       const updatedData = await response.json()
-
-//       if (this.debug) {
-//         console.log('Profile updated successfully:', updatedData)
-//       }
-
-//       return updatedData
-//     } catch (error) {
-//       console.error('Failed to update user profile:', error)
-//       throw error
-//     }
-//   }
 
 // Create a singleton instance
 let userApiServiceInstance = null

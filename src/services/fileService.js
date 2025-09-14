@@ -1,5 +1,5 @@
 import { getAuthService } from '@/services/authService'
-import { FileMetadata } from '@/models/FileMetadata'
+import { FileMetadataDto } from '@/models/FileMetadata'
 
 class FileApiService {
   constructor() {
@@ -45,7 +45,7 @@ class FileApiService {
       }
 
       const fileDataArray = await response.json()
-      const mappedFiles = fileDataArray.map((fileData) => FileMetadata.fromApiResponse(fileData))
+      const mappedFiles = fileDataArray.map((fileData) => FileMetadataDto.fromApiResponse(fileData))
 
       if (this.debug) {
         console.log('Raw file data:', fileDataArray)
@@ -63,7 +63,7 @@ class FileApiService {
    * Upload a file to the server
    * @param {File} file - The file object to upload
    * @param {Function} onProgress - Optional progress callback function
-   * @returns {Promise<FileMetadata>} The uploaded file metadata
+   * @returns {Promise<FileMetadataDto>} The uploaded file metadata
    */
   async uploadFile(file, onProgress = null) {
     try {
@@ -99,7 +99,7 @@ class FileApiService {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
               const responseData = JSON.parse(xhr.responseText)
-              const fileMetadata = FileMetadata.fromApiResponse(responseData)
+              const fileMetadata = FileMetadataDto.fromApiResponse(responseData)
 
               if (this.debug) {
                 console.log('File uploaded successfully:', fileMetadata)
@@ -527,6 +527,156 @@ class FileApiService {
       return result
     } catch (error) {
       console.error('Failed to share file:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get the total number of files stored in the system.
+   *
+   * @returns {Promise<Object>} number of files
+   */
+  async getTotalFiles() {
+    try {
+      if (this.debug) {
+        console.log('Fetching total number of files...')
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/admin/files/count`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Total number of files fetch failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('Total number of files:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to load total number of files:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get the total storage used in the system.
+   *
+   * @returns {Promise<Object>} number of files
+   */
+  async getTotalStorage() {
+    try {
+      if (this.debug) {
+        console.log('Fetching total used storage...')
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/admin/storage`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Total used storage fetch failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.json()
+
+      if (this.debug) {
+        console.log('Total used storage:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to load total used storage:', error)
+      throw error
+    }
+  }
+
+  /**
+   * Get system logs.
+   *
+   * @returns {Promise<Object>} logs
+   */
+  async getLogs(lines = 10) {
+    try {
+      if (this.debug) {
+        console.log('Fetching logs...')
+      }
+
+      const response = await this.authService.authenticatedFetch(
+        `${this.baseURL}/api/admin/logs/${lines}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        let message = `Logs fetch failed: ${response.status}`
+
+        try {
+          const json = JSON.parse(errorText)
+          message = json.message || message
+        } catch {
+          message = errorText || message
+        }
+
+        const error = new Error(message)
+        error.status = response.status
+        throw error
+      }
+
+      const data = await response.text()
+
+      if (this.debug) {
+        console.log('System logs:', data)
+      }
+
+      return data
+    } catch (error) {
+      console.error('Failed to load system logs:', error)
       throw error
     }
   }

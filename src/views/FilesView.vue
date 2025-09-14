@@ -103,7 +103,7 @@
 <script>
 import { getAuthService } from '@/services/authService'
 import { getFileApiService } from '@/services/fileService'
-import { FileMetadata } from '@/models/FileMetadata'
+import { FileMetadataDto } from '@/models/FileMetadata'
 import ShareFileModal from '@/components/ShareFileModal.vue'
 import RenameFileModal from '@/components/RenameFileModal.vue'
 
@@ -155,7 +155,7 @@ export default {
         response = await fileService.searchPaginatedFiles(page, this.pagination.size, keyword)
 
         // Map the raw API response to FileMetadata objects
-        this.files = response.content.map((fileData) => FileMetadata.fromApiResponse(fileData))
+        this.files = response.content.map((fileData) => FileMetadataDto.fromApiResponse(fileData))
         if (this.files.length == 0 && page != 0) {
           this.loadFiles(page - 1, keyword)
           return
@@ -210,7 +210,7 @@ export default {
         // Update the file in the local array
         const fileIndex = this.files.findIndex((f) => f.id === fileId)
         if (fileIndex !== -1) {
-          this.files[fileIndex] = FileMetadata.fromApiResponse(updatedFile)
+          this.files[fileIndex] = FileMetadataDto.fromApiResponse(updatedFile)
         }
 
         console.log('File renamed successfully:', updatedFile)

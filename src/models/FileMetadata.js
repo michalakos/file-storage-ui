@@ -1,6 +1,6 @@
 import { UserDto } from './UserDto'
 
-export class FileMetadata {
+export class FileMetadataDto {
   constructor(data = {}) {
     this.id = data.id || null
     this.filename = data.filename || ''
@@ -62,7 +62,7 @@ export class FileMetadata {
   // Static factory method
   static fromApiResponse(apiData) {
     console.log(apiData)
-    return new FileMetadata(apiData)
+    return new FileMetadataDto(apiData)
   }
 
   // Convert back to plain object (for API calls)

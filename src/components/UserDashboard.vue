@@ -80,7 +80,7 @@
 import { getAuthService } from '@/services/authService'
 import { getUserApiService } from '@/services/userService'
 import { getFileApiService } from '@/services/fileService'
-import { FileMetadata } from '@/models/FileMetadata'
+import { FileMetadataDto } from '@/models/FileMetadata'
 import ShareFileModal from '@/components/ShareFileModal.vue'
 import RenameFileModal from '@/components/RenameFileModal.vue'
 
@@ -187,22 +187,6 @@ export default {
       }
     },
 
-    async updateProfile(updatedData) {
-      console.log('Update profile', updatedData)
-      // try {
-      //   this.loading = true
-      //   const userApiService = getUserApiService()
-
-      //   this.userData = await userApiService.updateUserProfile(updatedData)
-      //   console.log('Profile updated successfully')
-      // } catch (error) {
-      //   console.error('Failed to update profile:', error)
-      //   this.error = error.message
-      // } finally {
-      //   this.loading = false
-      // }
-    },
-
     uploadFile() {
       this.$router.push('/upload')
     },
@@ -255,7 +239,7 @@ export default {
         // Update the file in the recentFiles array
         const fileIndex = this.recentFiles.findIndex((f) => f.id === fileId)
         if (fileIndex !== -1) {
-          this.recentFiles[fileIndex] = FileMetadata.fromApiResponse(updatedFile)
+          this.recentFiles[fileIndex] = FileMetadataDto.fromApiResponse(updatedFile)
         }
 
         console.log('File renamed successfully:', updatedFile)
@@ -286,10 +270,8 @@ export default {
 
         const userApiService = getUserApiService()
         this.usedStorage = await userApiService.getUsedStorage()
-        // this.usedStorage = this.formatFileSize(rawStorage)
 
         console.log('User used storage loaded successfully:', this.usedStorage)
-        console.log()
       } catch (error) {
         console.error('Failed to load user used storage:', error)
         this.error = error.message

@@ -1,54 +1,49 @@
 <template>
-  <div class="files-container">
-    <header class="files-header">
+  <div class="users-container">
+    <header class="users-header">
       <div class="header-content">
-        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
+        <h1 class="page-title-button" @click="goToDashboard">My Users</h1>
         <div class="search-section">
           <input
             v-model="searchQuery"
             type="text"
-            placeholder="Search shared files by name..."
+            placeholder="Search users by username or email..."
             class="search-input"
             @input="handleSearchInput"
           />
         </div>
-        <div class="header-actions">
-          <button @click="goToMyFiles" class="btn btn-secondary">📁 My Files</button>
-        </div>
       </div>
     </header>
 
-    <main class="files-main">
-      <div v-if="loading && files.length === 0" class="loading-state">
-        <p>Loading shared files...</p>
+    <main class="users-main">
+      <div v-if="loading && users.length === 0" class="loading-state">
+        <p>Loading users...</p>
       </div>
 
       <div v-else-if="error" class="error-state">
         <p>{{ error }}</p>
-        <button @click="loadFiles" class="btn btn-outline">Try Again</button>
+        <button @click="loadUsers" class="btn btn-outline">Try Again</button>
       </div>
 
-      <div v-else class="files-content">
-        <div v-if="files.length === 0" class="empty-state">
-          <div class="empty-icon">👥</div>
-          <h3>No shared files</h3>
-          <p>Files shared with you will appear here</p>
-          <button @click="goToMyFiles" class="btn btn-primary">View My Files</button>
+      <div v-else class="users-content">
+        <div v-if="users.length === 0" class="empty-state">
+          <div class="empty-icon">🫥</div>
+          <h3>No users yet</h3>
         </div>
 
         <div v-else>
-          <div class="files-grid">
-            <div v-for="file in files" :key="file.id" class="file-item">
-              <div class="file-icon">📄</div>
-              <div class="file-info">
-                <h4>{{ file.filename }}</h4>
-                <p class="file-meta">
-                  {{ file.formattedFileSize }} • {{ file.formattedUploadDate }}
-                  <span class="shared-by">• Shared by {{ file.userDto.displayName }}</span>
-                </p>
+          <div class="users-grid">
+            <div v-for="user in users" :key="user.id" class="user-item">
+              <div class="user-icon">👤</div>
+              <div class="user-info">
+                <h4>{{ user.username }}</h4>
+                <p class="user-data">{{ user.username }} • {{ user.email }}</p>
               </div>
-              <div class="file-actions">
-                <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
+              <div class="user-actions">
+                <button class="action-btn" @click="banUser(user)" title="Ban">🚫</button>
+                <button class="action-btn" @click="unbanUser(user)" title="Unban">✅</button>
+                <button class="action-btn" @click="changeRole(user)" title="Change Role">🔄</button>
+                <button class="action-btn" @click="deleteUser(user)" title="Delete">🗑️</button>
               </div>
             </div>
           </div>
@@ -67,7 +62,7 @@
               Page {{ pagination.currentPage }} of {{ pagination.totalPages }} ({{
                 pagination.totalElements
               }}
-              total shared files)
+              total users)
             </div>
 
             <button
@@ -86,14 +81,14 @@
 
 <script>
 import { getAuthService } from '@/services/authService'
-import { getFileApiService } from '@/services/fileService'
-import { FileMetadataDto } from '@/models/FileMetadata'
+import { getUserApiService } from '@/services/userService'
+import { UserDto } from '@/models/UserDto'
 
 export default {
-  name: 'SharedFilesView',
+  name: 'UsersView',
   data() {
     return {
-      files: [],
+      users: [],
       searchQuery: '',
       searchTimeout: null,
       loading: false,
@@ -114,26 +109,24 @@ export default {
       return
     }
 
-    await this.loadFiles()
+    await this.loadUsers()
   },
 
   methods: {
-    async loadFiles(page = 0, keyword = '') {
+    async loadUsers(page = 0, keyword = '') {
       try {
         this.loading = true
         this.error = null
 
-        const fileService = getFileApiService()
-        const response = await fileService.searchPaginatedSharedFiles(
-          page,
-          this.pagination.size,
-          keyword,
-        )
+        const userService = getUserApiService()
+        let response
+
+        response = await userService.searchUsersPaginated(page, this.pagination.size, keyword)
 
         // Map the raw API response to FileMetadata objects
-        this.files = response.content.map((fileData) => FileMetadataDto.fromApiResponse(fileData))
-        if (this.files.length == 0 && page != 0) {
-          this.loadFiles(page - 1, keyword)
+        this.users = response.content.map((userData) => UserDto.fromApiResponse(userData))
+        if (this.users.length == 0 && page != 0) {
+          this.loadUsers(page - 1, keyword)
           return
         }
 
@@ -144,11 +137,11 @@ export default {
           size: response.size,
         }
 
-        console.log('Shared files loaded successfully:', this.files)
+        console.log('Users loaded successfully:', this.users)
         console.log('Pagination info:', this.pagination)
       } catch (error) {
-        console.error('Failed to load shared files:', error)
-        this.error = error.message || 'Failed to load shared files'
+        console.error('Failed to load users:', error)
+        this.error = error.message || 'Failed to load users'
       } finally {
         this.loading = false
       }
@@ -165,7 +158,23 @@ export default {
     },
 
     async performSearch() {
-      await this.loadFiles(0, this.searchQuery.trim())
+      await this.loadUsers(0, this.searchQuery.trim())
+    },
+
+    async banUser(user) {
+      console.log('banning user', user)
+    },
+
+    async unbanUser(user) {
+      console.log('unbanning user', user)
+    },
+
+    async changeRole(user) {
+      console.log('changing role for user', user)
+    },
+
+    async deleteUser(user) {
+      console.log('deleting user', user)
     },
 
     async goToPage(page) {
@@ -173,21 +182,7 @@ export default {
       if (actualPage < 0 || actualPage > this.pagination.totalPages - 1) {
         return
       }
-      await this.loadFiles(actualPage, this.searchQuery.trim())
-    },
-
-    goToMyFiles() {
-      this.$router.push('/files')
-    },
-
-    async downloadFile(file) {
-      try {
-        const fileService = getFileApiService()
-        await fileService.downloadFile(file.id)
-      } catch (error) {
-        console.error('Download failed:', error)
-        this.error = 'Failed to download file'
-      }
+      await this.loadUsers(actualPage, this.searchQuery.trim())
     },
 
     goToDashboard() {
@@ -206,12 +201,12 @@ export default {
   opacity: 0.8;
 }
 
-.files-container {
+.users-container {
   min-height: 100vh;
   background-color: #f8fafc;
 }
 
-.files-header {
+.users-header {
   background: white;
   border-bottom: 1px solid #e2e8f0;
   padding: 1rem 0;
@@ -234,19 +229,19 @@ export default {
   font-weight: 700;
   color: white;
   margin: 0;
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
 }
 
 .page-title-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
-  background: linear-gradient(135deg, #059669, #047857);
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #2563eb, #1e40af);
 }
 
 .search-section {
@@ -268,8 +263,8 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .header-actions {
@@ -277,7 +272,7 @@ export default {
   gap: 1rem;
 }
 
-.files-main {
+.users-main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
@@ -312,7 +307,7 @@ export default {
   margin: 0 0 2rem 0;
 }
 
-.files-grid {
+.users-grid {
   background: white;
   border-radius: 12px;
   border: 1px solid #e2e8f0;
@@ -320,7 +315,7 @@ export default {
   margin-bottom: 2rem;
 }
 
-.file-item {
+.user-item {
   display: flex;
   align-items: center;
   padding: 1rem 1.5rem;
@@ -328,42 +323,37 @@ export default {
   transition: background-color 0.2s ease;
 }
 
-.file-item:hover {
+.user-item:hover {
   background-color: #f8fafc;
 }
 
-.file-item:last-child {
+.user-item:last-child {
   border-bottom: none;
 }
 
-.file-icon {
+.user-icon {
   font-size: 1.5rem;
   margin-right: 1rem;
 }
 
-.file-info {
+.user-info {
   flex: 1;
 }
 
-.file-info h4 {
+.user-info h4 {
   font-size: 1rem;
   font-weight: 500;
   color: #1e293b;
   margin: 0 0 0.25rem 0;
 }
 
-.file-meta {
+.user-data {
   font-size: 0.875rem;
   color: #64748b;
   margin: 0;
 }
 
-.shared-by {
-  color: #10b981;
-  font-weight: 500;
-}
-
-.file-actions {
+.user-actions {
   display: flex;
   gap: 0.5rem;
 }
@@ -437,15 +427,6 @@ export default {
 
 .btn-primary:hover {
   background-color: #2563eb;
-}
-
-.btn-secondary {
-  background-color: #64748b;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background-color: #475569;
 }
 
 .btn-outline {

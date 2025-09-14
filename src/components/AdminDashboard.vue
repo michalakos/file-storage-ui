@@ -5,7 +5,7 @@
         <h1 class="app-title">File Storage - Admin Panel</h1>
         <div class="user-info">
           <span class="admin-badge">Admin</span>
-          <span class="welcome-text">Welcome, {{ username }}!</span>
+          <span class="welcome-text">Welcome, {{ this.userData?.username ?? 'admin' }}!</span>
           <button @click="handleLogout" class="btn btn-secondary">Logout</button>
         </div>
       </div>
@@ -37,14 +37,6 @@
               <p>Storage Used</p>
             </div>
           </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">⚡</div>
-            <div class="stat-content">
-              <h3>{{ activeUsers }}</h3>
-              <p>Active Today</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -62,27 +54,10 @@
             <h3>System Logs</h3>
             <p>Monitor system activity and logs</p>
           </div>
-
-          <div class="action-card" @click="manageStorage">
-            <div class="action-icon">🗄️</div>
-            <h3>Storage Management</h3>
-            <p>Monitor and manage storage usage</p>
-          </div>
-
-          <div class="action-card" @click="systemSettings">
-            <div class="action-icon">⚙️</div>
-            <h3>System Settings</h3>
-            <p>Configure system preferences</p>
-          </div>
         </div>
       </section>
 
       <section class="recent-activity">
-        <div class="section-header">
-          <h2>Recent Activity</h2>
-          <button class="btn btn-outline">View All Logs</button>
-        </div>
-
         <div class="activity-list">
           <div v-for="activity in recentActivity" :key="activity.id" class="activity-item">
             <div class="activity-icon" :class="activity.type">
@@ -101,60 +76,23 @@
           </div>
         </div>
       </section>
-
-      <section class="user-management">
-        <div class="section-header">
-          <h2>User Management</h2>
-          <button class="btn btn-primary" @click="addNewUser">Add New User</button>
-        </div>
-
-        <div class="users-table">
-          <div class="table-header">
-            <div class="header-cell">User</div>
-            <div class="header-cell">Role</div>
-            <div class="header-cell">Storage Used</div>
-            <div class="header-cell">Last Active</div>
-            <div class="header-cell">Actions</div>
-          </div>
-
-          <div v-for="user in recentUsers" :key="user.id" class="table-row">
-            <div class="table-cell">
-              <div class="user-info">
-                <div class="user-avatar">{{ user.name.charAt(0) }}</div>
-                <div>
-                  <div class="user-name">{{ user.name }}</div>
-                  <div class="user-email">{{ user.email }}</div>
-                </div>
-              </div>
-            </div>
-            <div class="table-cell">
-              <span class="role-badge" :class="user.role">{{ user.role }}</span>
-            </div>
-            <div class="table-cell">{{ user.storageUsed }}</div>
-            <div class="table-cell">{{ user.lastActive }}</div>
-            <div class="table-cell">
-              <button class="action-btn" @click="editUser(user)" title="Edit">✏️</button>
-              <button class="action-btn" @click="suspendUser(user)" title="Suspend">⏸️</button>
-            </div>
-          </div>
-        </div>
-      </section>
     </main>
   </div>
 </template>
 
 <script>
 import { getAuthService } from '@/services/authService'
+import { getUserApiService } from '@/services/userService'
+import { getFileApiService } from '@/services/fileService'
 
 export default {
   name: 'AdminDashboard',
   data() {
     return {
-      username: 'Admin',
-      totalUsers: '1,248',
-      totalFiles: '15,692',
-      totalStorage: '245 GB',
-      activeUsers: '89',
+      userData: null,
+      totalUsers: 0,
+      totalFiles: 0,
+      totalStorage: '0 GB',
       recentActivity: [
         {
           id: 1,
@@ -220,18 +158,100 @@ export default {
 
     // Load admin data
     await this.loadAdminData()
+    await this.getTotalFiles()
+    await this.getTotalUsers()
+    await this.getTotalStorage()
+    await this.getLogs()
   },
 
   methods: {
     async loadAdminData() {
       try {
-        console.log('load admin data')
-        // const authService = getAuthService()
-        // Make authenticated API calls to get admin data
-        // const response = await authService.authenticatedFetch(`${authService.baseURL}/api/admin/dashboard`)
-        // Update component data with real data from API
+        this.loading = true
+        this.error = null
+
+        const userApiService = getUserApiService()
+        this.userData = await userApiService.getUserAccount()
+
+        console.log('User data loaded successfully:', this.userData)
       } catch (error) {
-        console.error('Failed to load admin data:', error)
+        console.error('Failed to load user data:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getTotalFiles() {
+      console.log('Fetching total number of files')
+      try {
+        this.loading = true
+        this.error = null
+
+        const fileApiService = getFileApiService()
+        this.totalFiles = await fileApiService.getTotalFiles()
+
+        console.log('Total number of files loaded successfully:', this.totalFiles)
+      } catch (error) {
+        console.error('Failed to load total number of files:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getTotalUsers() {
+      console.log('Fetching total number of users')
+      try {
+        this.loading = true
+        this.error = null
+
+        const userApiService = getUserApiService()
+        this.totalUsers = await userApiService.getTotalUsers()
+
+        console.log('Total number of users loaded successfully:', this.totalUsers)
+      } catch (error) {
+        console.error('Failed to load total number of users:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getTotalStorage() {
+      console.log('Fetching total used storage')
+      try {
+        this.loading = true
+        this.error = null
+
+        const fileApiService = getFileApiService()
+        const usedStorage = await fileApiService.getTotalStorage()
+        this.totalStorage = this.formatFileSize(usedStorage)
+
+        console.log('Total used storage loaded successfully:', this.totalStorage)
+      } catch (error) {
+        console.error('Failed to load total used storage:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async getLogs(lines = 10) {
+      console.log('Fetching system logs')
+      try {
+        this.loading = true
+        this.error = null
+
+        const fileApiService = getFileApiService()
+        const logs = await fileApiService.getLogs(lines)
+
+        console.log('System lgos loaded successfully:', logs)
+      } catch (error) {
+        console.error('Failed to load system logs:', error)
+        this.error = error.message
+      } finally {
+        this.loading = false
       }
     },
 
@@ -243,6 +263,16 @@ export default {
         file: '📁',
       }
       return icons[type] || '📋'
+    },
+
+    formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes'
+
+      const k = 1000
+      const sizes = ['Bytes', 'KB', 'MB', 'GB']
+      const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
     },
 
     manageUsers() {

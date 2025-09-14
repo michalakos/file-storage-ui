@@ -109,6 +109,20 @@ class AuthService {
     return this.store.isAuthenticated
   }
 
+  isAdmin() {
+    const token = this.getToken()
+    if (!token) return false
+
+    try {
+      // Decode JWT payload (middle part of token)
+      const payload = JSON.parse(atob(token.split('.')[1]))
+      return payload.role === 'admin'
+    } catch (error) {
+      console.error('Error decoding token:', error)
+      return false
+    }
+  }
+
   // Get authorization header for API calls
   getAuthHeader() {
     const token = this.getToken()

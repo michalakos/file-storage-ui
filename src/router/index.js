@@ -10,6 +10,7 @@ import DashboardRouter from '@/views/DashboardRouter.vue'
 import FileUpload from '@/views/FileUpload.vue'
 import FilesView from '@/views/FilesView.vue'
 import SharedFilesView from '@/views/SharedFilesView.vue'
+import UsersView from '@/views/UsersView.vue'
 
 const routes = [
   {
@@ -51,6 +52,12 @@ const routes = [
     component: SharedFilesView,
     meta: { requiresAuth: true },
   },
+  {
+    path: '/admin/users',
+    name: 'AdminUsers',
+    component: UsersView,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
 ]
 
 const router = createRouter({
@@ -64,6 +71,8 @@ router.beforeEach((to, from, next) => {
 
   if (to.meta.requiresAuth && !authService.isAuthenticated()) {
     next('/')
+  } else if (to.meta.requiresAdmin && !authService.isAdmin()) {
+    next('/dashboard')
   } else {
     next()
   }
