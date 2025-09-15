@@ -56,6 +56,7 @@
         <div class="form-group">
           <label class="checkbox-label">
             <input v-model="readOnly" type="checkbox" class="checkbox" />
+            <span></span>
             Read-only access
           </label>
           <p class="help-text">
@@ -217,6 +218,65 @@ export default {
 </script>
 
 <style scoped>
+/* Wrap stays the same */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Hide native checkbox but keep it accessible */
+.checkbox {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom box */
+.checkbox + span {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--color-gray-300);
+  border-radius: 4px;
+  background: var(--color-white);
+  margin-right: var(--space-sm);
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base);
+}
+
+/* Tick mark (hidden by default) */
+.checkbox + span::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--color-primary);
+  border-width: 0 2px 2px 0;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.8);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* Checked state */
+.checkbox:checked + span {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.checkbox:checked + span::after {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -231,20 +291,18 @@ export default {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 12px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
   width: 90%;
   max-width: 500px;
   max-height: 80vh;
   overflow: hidden;
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-xl);
 }
 
 .modal-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid #e2e8f0;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-200);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -252,31 +310,32 @@ export default {
 
 .modal-header h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   cursor: pointer;
-  color: #64748b;
+  color: var(--color-text-secondary);
   padding: 0;
   width: 24px;
   height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: color var(--transition-base);
 }
 
 .close-btn:hover {
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: var(--space-lg);
   max-height: 50vh;
   overflow-y: auto;
 }
@@ -284,83 +343,73 @@ export default {
 .file-info {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background-color: #f8fafc;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
+  padding: var(--space-md);
+  background-color: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
 }
 
 .file-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-xl);
+  margin-right: var(--space-md);
 }
 
 .file-info h4 {
-  margin: 0 0 0.25rem 0;
-  font-size: 1rem;
+  margin: 0 0 var(--space-xs) 0;
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1e293b;
+  color: var(--color-text-primary);
 }
 
 .file-meta {
   margin: 0;
-  font-size: 0.875rem;
-  color: #64748b;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #374151;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: var(--space-sm);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  font-family: var(--font-system);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 165, 82, 0.1);
 }
 
 .search-input:disabled {
-  background-color: #f9fafb;
-  color: #6b7280;
+  background-color: var(--color-gray-50);
+  color: var(--color-text-muted);
 }
 
 .user-results {
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-bottom: 1rem;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-md);
   max-height: 200px;
   overflow-y: auto;
 }
 
 .user-item {
-  padding: 0.75rem;
-  border-bottom: 1px solid #f3f4f6;
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-gray-100);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
 .user-item:hover {
-  background-color: #f9fafb;
+  background-color: var(--color-gray-50);
 }
 
 .user-item:last-child {
@@ -368,45 +417,48 @@ export default {
 }
 
 .user-item.selected {
-  background-color: #eff6ff;
-  border-color: #bfdbfe;
+  background-color: var(--color-cream-light);
+  border-color: var(--color-cream);
 }
 
 .user-info strong {
   display: block;
-  color: #1f2937;
-  margin-bottom: 0.125rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-xs);
 }
 
 .user-email {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .selected-user {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-lg);
 }
 
 .selected-user h5 {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.875rem;
+  margin: 0 0 var(--space-sm) 0;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #374151;
+  color: var(--color-text-primary);
 }
 
 .clear-btn {
   background: none;
   border: none;
-  color: #6b7280;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 4px;
-  font-size: 0.875rem;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  transition:
+    color var(--transition-base),
+    background-color var(--transition-base);
 }
 
 .clear-btn:hover {
-  color: #374151;
-  background-color: #f3f4f6;
+  color: var(--color-text-primary);
+  background-color: var(--color-gray-100);
 }
 
 .checkbox-label {
@@ -416,64 +468,21 @@ export default {
 }
 
 .checkbox {
-  margin-right: 0.5rem;
+  margin-right: var(--space-sm);
   margin-bottom: 0 !important;
 }
 
 .help-text {
-  margin: 0.5rem 0 0 0;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.error-message {
-  padding: 0.75rem;
-  background-color: #fef2f2;
-  color: #dc2626;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  border: 1px solid #fecaca;
+  margin: var(--space-sm) 0 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .modal-footer {
-  padding: 1.5rem;
-  border-top: 1px solid #e2e8f0;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--color-gray-200);
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 0.875rem;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.btn-secondary {
-  background-color: #f8fafc;
-  color: #475569;
-  border: 1px solid #e2e8f0;
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background-color: #f1f5f9;
-}
-
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background-color: #2563eb;
+  gap: var(--space-sm);
 }
 </style>

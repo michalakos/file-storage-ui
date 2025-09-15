@@ -1,7 +1,7 @@
 <template>
-  <div class="admin-logs">
+  <div class="admin-logs container">
     <header class="logs-header">
-      <div class="header-content">
+      <div class="header header-content">
         <button @click="goToDashboard" class="dashboard-btn">← Back to Dashboard</button>
         <h1 class="page-title">System Logs</h1>
         <div class="header-controls">
@@ -287,103 +287,95 @@ export default {
 <style scoped>
 .admin-logs {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 2rem;
+  background: var(--color-cream-light);
+  padding: var(--space-xl);
 }
 
 .logs-header {
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .dashboard-btn {
-  background: #667eea;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-white);
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
+  font-family: var(--font-system);
+  transition: background-color var(--transition-base);
+}
+
+.dashboard-btn:hover {
+  background: var(--color-brown);
 }
 
 .page-title {
   margin: 0;
-  color: #2d3748;
-  font-size: 2rem;
+  color: var(--color-brown-dark);
+  font-size: var(--text-3xl);
 }
 
 .pause-btn {
-  background: #48bb78;
-  color: white;
+  background: var(--color-success);
+  color: var(--color-white);
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-weight: 600;
+  font-family: var(--font-system);
+  width: 100px;
+  transition: background-color var(--transition-base);
 }
 
 .pause-btn.paused {
-  background: #f56565;
+  background: var(--color-error);
 }
 
 .logs-controls {
-  background: white;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 2rem;
+  background: var(--color-white);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xl);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
-.log-slider {
-  flex: 1;
-  max-width: 300px;
+.logs-content {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  box-shadow: var(--shadow-md);
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
-.log-desc {
-  margin: 0 0 0.5rem 0;
-  color: #4a5568;
-  line-height: 1.5;
-  word-break: break-word;
-  max-height: 3.6em; /* Roughly 3 lines */
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-}
-
-.log-desc.expanded {
-  max-height: none;
-}
-
-.expand-indicator {
-  font-size: 0.75rem;
-  color: #667eea;
-  font-weight: 600;
-  margin-top: 0.25rem;
-  user-select: none;
-}
-
-.log-content {
-  flex: 1;
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
 .log-item {
   display: flex;
   align-items: flex-start;
-  padding: 1.5rem;
-  background: #f7fafc;
-  border-radius: 8px;
-  border-left: 4px solid #e2e8f0;
-  transition: all 0.3s ease;
+  padding: var(--space-lg);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--color-gray-300);
+  transition: all var(--transition-base);
 }
 
 .log-item.expandable {
@@ -392,57 +384,33 @@ export default {
 
 .log-item.expandable:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  background: rgba(68, 29, 120, 0.2);
-}
-
-.logs-content {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
-.logs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.log-item {
-  display: flex;
-  align-items: flex-start;
-  padding: 1.5rem;
-  background: #f7fafc;
-  border-radius: 8px;
-  border-left: 4px solid #e2e8f0;
+  box-shadow: var(--shadow-lg);
+  background: var(--color-cream-light);
 }
 
 .log-item.error {
-  border-left-color: #f56565;
-  background: #fed7d7;
+  border-left-color: var(--color-error);
+  background: var(--color-error-bg);
 }
 
 .log-item.warning {
-  border-left-color: #ed8936;
-  background: #feebc8;
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-bg);
 }
 
 .log-item.info {
-  border-left-color: #4299e1;
-  background: #bee3f8;
+  border-left-color: var(--color-info);
+  background: var(--color-info-bg);
 }
 
 .log-item.debug {
-  border-left-color: #9f7aea;
-  background: #e9d8fd;
+  border-left-color: var(--color-secondary);
+  background: var(--color-sage-light);
 }
 
 .log-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-xl);
+  margin-right: var(--space-md);
   flex-shrink: 0;
 }
 
@@ -451,97 +419,99 @@ export default {
 }
 
 .log-content h4 {
-  margin: 0 0 0.5rem 0;
-  color: #2d3748;
-  font-size: 1.1rem;
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--color-text-primary);
+  font-size: var(--text-lg);
   font-weight: 600;
 }
 
 .log-desc {
-  margin: 0 0 0.5rem 0;
-  color: #4a5568;
+  margin: 0 0 var(--space-sm) 0;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   word-break: break-word;
+  max-height: 3.6em;
+  overflow: hidden;
+  transition: max-height var(--transition-slow);
+}
+
+.log-desc.expanded {
+  max-height: none;
 }
 
 .log-time {
   margin: 0;
-  color: #718096;
-  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.expand-indicator {
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-top: var(--space-xs);
+  user-select: none;
 }
 
 .log-status {
-  margin-left: 1rem;
+  margin-left: var(--space-md);
   flex-shrink: 0;
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
+  padding: var(--space-xs) var(--space-sm);
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   text-transform: uppercase;
 }
 
 .status-badge.error {
-  background: #f56565;
-  color: white;
+  background: var(--color-error);
+  color: var(--color-white);
 }
 
 .status-badge.warning {
-  background: #ed8936;
-  color: white;
+  background: var(--color-warning);
+  color: var(--color-white);
 }
 
 .status-badge.info {
-  background: #4299e1;
-  color: white;
+  background: var(--color-info);
+  color: var(--color-white);
 }
 
 .status-badge.debug {
-  background: #9f7aea;
-  color: white;
+  background: var(--color-secondary);
+  color: var(--color-white);
 }
 
 .loading-state,
 .error-state {
   text-align: center;
-  padding: 3rem;
-  color: white;
-}
-
-.btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.btn-outline {
-  background: transparent;
-  color: white;
-  border: 2px solid white;
+  padding: var(--space-3xl);
+  color: var(--color-text-primary);
 }
 
 .button-group {
   display: flex;
   gap: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border: 1px solid #d1d5db;
-  margin-left: 1rem;
+  border: 1px solid var(--color-gray-300);
+  margin-left: var(--space-md);
 }
 
 .count-btn {
-  padding: 0.5rem 1rem;
+  padding: var(--space-sm) var(--space-md);
   border: none;
-  background: white;
-  color: #374151;
+  background: var(--color-white);
+  color: var(--color-text-primary);
   cursor: pointer;
   font-weight: 500;
-  transition: all 0.2s ease;
-  border-right: 1px solid #d1d5db;
+  font-family: var(--font-system);
+  transition: all var(--transition-base);
+  border-right: 1px solid var(--color-gray-300);
   min-width: 50px;
 }
 
@@ -550,15 +520,15 @@ export default {
 }
 
 .count-btn:hover {
-  background: #f3f4f6;
+  background: var(--color-gray-50);
 }
 
 .count-btn.active {
-  background: #667eea;
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
 .count-btn.active:hover {
-  background: #5a67d8;
+  background: var(--color-brown);
 }
 </style>

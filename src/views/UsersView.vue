@@ -1,8 +1,8 @@
 <template>
-  <div class="users-container">
-    <header class="users-header">
+  <div class="users-container container">
+    <header class="header users-header">
       <div class="header-content">
-        <h1 class="page-title-button" @click="goToDashboard">My Users</h1>
+        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
         <div class="search-section">
           <input
             v-model="searchQuery"
@@ -64,7 +64,9 @@
                   ✅
                 </button>
                 <button class="action-btn" @click="changeRole(user)" title="Change Role">🔄</button>
-                <button class="action-btn" @click="deleteUser(user)" title="Delete">🗑️</button>
+                <button class="action-btn delete-btn" @click="deleteUser(user)" title="Delete">
+                  🗑️
+                </button>
               </div>
             </div>
           </div>
@@ -284,138 +286,101 @@ export default {
 </script>
 
 <style scoped>
-.clickable {
-  cursor: pointer;
-}
-
-.clickable:hover {
-  opacity: 0.8;
-}
-
 .users-container {
   min-height: 100vh;
-  background-color: #f8fafc;
-}
-
-.users-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background-color: var(--color-cream-light);
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--space-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.page-title-button {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
-
-.page-title-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-}
-
 .search-section {
   flex: 1;
   max-width: 400px;
-  margin: 0 2rem;
+  margin: 0 var(--space-xl);
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 165, 82, 0.1);
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .users-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--space-xl) var(--space-lg);
 }
 
 .loading-state,
 .error-state {
   text-align: center;
-  padding: 3rem;
-  color: #64748b;
+  padding: var(--space-3xl);
+  color: var(--color-text-secondary);
 }
 
 .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: var(--space-3xl) var(--space-xl);
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: var(--text-5xl);
+  margin-bottom: var(--space-md);
 }
 
 .empty-state h3 {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .empty-state p {
-  color: #64748b;
-  margin: 0 0 2rem 0;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-xl) 0;
 }
 
 .users-grid {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 }
 
 .user-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background-color 0.2s ease;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color var(--transition-base);
 }
 
 .user-item:hover {
-  background-color: #f8fafc;
+  background-color: var(--color-gray-50);
 }
 
 .user-item:last-child {
@@ -423,8 +388,8 @@ export default {
 }
 
 .user-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-xl);
+  margin-right: var(--space-md);
 }
 
 .user-info {
@@ -432,35 +397,21 @@ export default {
 }
 
 .user-info h4 {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-xs) 0;
 }
 
 .user-data {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .user-actions {
   display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
-}
-
-.action-btn:hover {
-  background-color: #f1f5f9;
+  gap: var(--space-sm);
 }
 
 .action-btn:disabled,
@@ -477,30 +428,30 @@ export default {
 }
 
 .admin-badge {
-  background: #667eea;
-  color: white;
+  background: var(--color-brown);
+  color: var(--color-white);
   font-size: 0.6em;
   padding: 0.2em 0.5em;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-weight: bold;
   margin-left: 0.5em;
 }
 
 .banned-badge {
-  background: #f56565;
-  color: white;
+  background: var(--color-error);
+  color: var(--color-white);
   font-size: 0.6em;
   padding: 0.2em 0.5em;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-weight: bold;
 }
 
 .current-user-badge {
-  background: #48bb78;
-  color: white;
+  background: var(--color-success);
+  color: var(--color-white);
   font-size: 0.6em;
   padding: 0.2em 0.5em;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   font-weight: bold;
   margin-left: 0.5em;
 }
@@ -509,25 +460,25 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  padding: var(--space-md);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
 }
 
 .pagination-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-gray-200);
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
+  transition: var(--transition-base);
+  font-size: var(--text-sm);
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-300);
 }
 
 .pagination-btn:disabled {
@@ -536,39 +487,39 @@ export default {
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 
 .btn {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: var(--transition-base);
   border: none;
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .btn-primary {
-  background-color: #3b82f6;
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-white);
 }
 
 .btn-primary:hover {
-  background-color: #2563eb;
+  background-color: var(--color-brown);
 }
 
 .btn-outline {
-  background-color: white;
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
+  background-color: var(--color-white);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
 }
 
 .btn-outline:hover {
-  background-color: #eff6ff;
+  background-color: var(--color-cream-light);
 }
 </style>

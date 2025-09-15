@@ -1,8 +1,8 @@
 <template>
-  <div class="dashboard-container">
-    <header class="dashboard-header">
+  <div class="dashboard-container container">
+    <header class="header dashboard-header">
       <div class="header-content">
-        <h1 class="app-title">File Storage</h1>
+        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
         <div class="user-info">
           <span class="admin-badge" v-if="isUserAdmin">Admin</span>
           <span class="welcome-text">Welcome back, {{ this.userData?.username ?? 'user' }}!</span>
@@ -49,7 +49,9 @@
               <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
               <button class="action-btn" @click="renameFile(file)" title="Rename">✏️</button>
               <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
-              <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
+              <button class="action-btn delete-btn" @click="deleteFile(file)" title="Delete">
+                🗑️
+              </button>
             </div>
           </div>
         </div>
@@ -335,22 +337,22 @@ export default {
 
 <style scoped>
 .files-grid {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
   overflow: hidden;
 }
 
 .file-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background-color 0.2s ease;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color var(--transition-base);
 }
 
 .file-item:hover {
-  background-color: #f8fafc;
+  background-color: var(--color-gray-50);
 }
 
 .file-item:last-child {
@@ -358,8 +360,8 @@ export default {
 }
 
 .file-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-xl);
+  margin-right: var(--space-md);
 }
 
 .file-info {
@@ -367,49 +369,49 @@ export default {
 }
 
 .file-info h4 {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-xs) 0;
 }
 
 .file-meta {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .file-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--space-sm);
 }
 
 .usage-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
 }
 
 .usage-bar {
   width: 100%;
   height: 8px;
-  background-color: #f1f5f9;
-  border-radius: 4px;
+  background-color: var(--color-gray-100);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-sm);
 }
 
 .usage-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-brown));
+  border-radius: var(--radius-sm);
+  transition: width var(--transition-slow);
 }
 
 .usage-text {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 </style>

@@ -35,6 +35,10 @@ export default {
   gap: 1rem;
 }
 
+.btn-auth {
+  margin-top: 0px;
+}
+
 @media (min-width: 768px) {
   .button-group {
     flex-direction: row;

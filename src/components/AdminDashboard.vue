@@ -1,8 +1,11 @@
 <template>
-  <div class="admin-dashboard dashboard-container">
-    <header class="dashboard-header">
+  <div class="admin-dashboard dashboard-container container">
+    <header class="header dashboard-header">
       <div class="header-content">
-        <h1 class="app-title">File Storage - Admin Panel</h1>
+        <span class="user-info">
+          <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
+          <h1 class="welcome-text">Admin Panel</h1>
+        </span>
         <div class="user-info">
           <span class="admin-badge">Admin</span>
           <span class="welcome-text">Welcome, {{ this.userData?.username ?? 'admin' }}!</span>
@@ -387,49 +390,63 @@ export default {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
 }
 
 .stat-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-md);
+  transition: var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .stat-icon {
-  font-size: 2rem;
+  font-size: var(--text-4xl);
+  color: var(--color-primary);
 }
 
 .stat-content h3 {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
 .stat-content p {
-  color: #64748b;
-  font-size: 0.875rem;
-  margin: 0.25rem 0 0 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: var(--space-xs) 0 0 0;
 }
 
 .activity-list {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .activity-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: var(--transition-base);
+}
+
+.activity-item:hover {
+  background-color: var(--color-gray-50);
 }
 
 .activity-item:last-child {
@@ -439,24 +456,34 @@ export default {
 .activity-icon {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 1rem;
-  font-size: 1.25rem;
+  margin-right: var(--space-md);
+  font-size: var(--text-xl);
+  background-color: var(--color-accent);
+  color: var(--color-dark);
 }
 
-.activity-icon.user {
-  background-color: #e0f2fe;
+.activity-icon.error {
+  background-color: var(--color-error-bg);
+  color: var(--color-error);
 }
 
-.activity-icon.system {
-  background-color: #f3e8ff;
+.activity-icon.warning {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
 }
 
-.activity-icon.security {
-  background-color: #fee2e2;
+.activity-icon.info {
+  background-color: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.activity-icon.debug {
+  background-color: var(--color-gray-100);
+  color: var(--color-gray-600);
 }
 
 .activity-content {
@@ -464,33 +491,26 @@ export default {
 }
 
 .activity-content h4 {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-xs) 0;
 }
 
 .activity-desc {
-  color: #64748b;
-  font-size: 0.875rem;
-  margin: 0 0 0.25rem 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-xs) 0;
 }
 
 .activity-time {
-  color: #94a3b8;
-  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
   margin: 0;
 }
 
 .activity-status {
-  margin-left: 1rem;
-}
-
-.users-table {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-  overflow: hidden;
+  margin-left: var(--space-md);
 }
 
 @media (max-width: 768px) {
@@ -506,7 +526,7 @@ export default {
   .activity-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: var(--space-sm);
   }
 
   .activity-icon {

@@ -1,8 +1,8 @@
 <template>
-  <div class="files-container">
-    <header class="files-header">
+  <div class="files-container container">
+    <header class="header files-header">
       <div class="header-content">
-        <h1 class="page-title-button" @click="goToDashboard">My Files</h1>
+        <h1 class="page-title-button" @click="goToDashboard">SafeStash</h1>
         <div class="search-section">
           <input
             v-model="searchQuery"
@@ -50,7 +50,9 @@
                 <button class="action-btn" @click="downloadFile(file)" title="Download">⬇️</button>
                 <button class="action-btn" @click="renameFile(file)" title="Rename">✏️</button>
                 <button class="action-btn" @click="shareFile(file)" title="Share">🔗</button>
-                <button class="action-btn" @click="deleteFile(file)" title="Delete">🗑️</button>
+                <button class="action-btn delete-btn" @click="deleteFile(file)" title="Delete">
+                  🗑️
+                </button>
               </div>
             </div>
           </div>
@@ -291,128 +293,100 @@ export default {
 
 .files-container {
   min-height: 100vh;
-  background-color: #f8fafc;
-}
-
-.files-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  background-color: var(--color-gray-50);
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 var(--space-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.page-title-button {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: white;
-  margin: 0;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-}
-
-.page-title-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-}
-
 .search-section {
   flex: 1;
   max-width: 400px;
-  margin: 0 2rem;
+  margin: 0 var(--space-xl);
 }
 
 .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: var(--font-system);
   transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
 }
 
 .search-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 165, 82, 0.1);
 }
 
 .header-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-md);
 }
 
 .files-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1.5rem;
+  padding: var(--space-xl) var(--space-lg);
 }
 
 .loading-state,
 .error-state {
   text-align: center;
-  padding: 3rem;
-  color: #64748b;
+  padding: var(--space-3xl);
+  color: var(--color-text-secondary);
 }
 
 .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
+  padding: var(--space-3xl) var(--space-xl);
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: var(--text-5xl);
+  margin-bottom: var(--space-md);
 }
 
 .empty-state h3 {
-  font-size: 1.5rem;
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1e293b;
-  margin: 0 0 0.5rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-sm) 0;
 }
 
 .empty-state p {
-  color: #64748b;
-  margin: 0 0 2rem 0;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-xl) 0;
 }
 
 .files-grid {
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-xl);
 }
 
 .file-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #f1f5f9;
-  transition: background-color 0.2s ease;
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-gray-100);
+  transition: background-color var(--transition-base);
 }
 
 .file-item:hover {
-  background-color: #f8fafc;
+  background-color: var(--color-gray-50);
 }
 
 .file-item:last-child {
@@ -420,8 +394,8 @@ export default {
 }
 
 .file-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-xl);
+  margin-right: var(--space-md);
 }
 
 .file-info {
@@ -429,60 +403,47 @@ export default {
 }
 
 .file-info h4 {
-  font-size: 1rem;
+  font-size: var(--text-base);
   font-weight: 500;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-xs) 0;
 }
 
 .file-meta {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .file-actions {
   display: flex;
-  gap: 0.5rem;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: background-color 0.2s ease;
-}
-
-.action-btn:hover {
-  background-color: #f1f5f9;
+  gap: var(--space-sm);
 }
 
 .pagination {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: white;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  padding: var(--space-md);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
 }
 
 .pagination-btn {
-  padding: 0.5rem 1rem;
-  border: 1px solid #e2e8f0;
-  background: white;
-  border-radius: 6px;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-gray-200);
+  background: var(--color-white);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
+  transition: all var(--transition-base);
+  font-size: var(--text-sm);
+  font-family: var(--font-system);
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background-color: #f8fafc;
-  border-color: #cbd5e1;
+  background-color: var(--color-gray-50);
+  border-color: var(--color-gray-300);
 }
 
 .pagination-btn:disabled {
@@ -491,39 +452,7 @@ export default {
 }
 
 .pagination-info {
-  font-size: 0.875rem;
-  color: #64748b;
-}
-
-.btn {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 0.875rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #2563eb;
-}
-
-.btn-outline {
-  background-color: white;
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
-}
-
-.btn-outline:hover {
-  background-color: #eff6ff;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
 }
 </style>

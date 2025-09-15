@@ -9,3 +9,5 @@ Web app UI for use with file storage project written in Vue 3.
 - Dockerize
 
 ### Fix styling
+
+- Fix share modal

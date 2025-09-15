@@ -45,7 +45,11 @@
           />
         </div>
 
-        <button type="submit" class="btn btn-auth btn-primary btn-full" :disabled="loading">
+        <button
+          type="submit"
+          class="btn btn-primary btn-full btn-auth card-auth form-control"
+          :disabled="loading"
+        >
           {{ loading ? 'Registering...' : 'Register' }}
         </button>
       </form>
@@ -109,26 +113,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.error-message {
-  background-color: #fee;
-  color: #c33;
-  padding: 0.75rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  border: 1px solid #fcc;
-  font-size: 0.9rem;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-</style>

@@ -182,24 +182,25 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(56, 29, 42, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 1rem;
+  padding: var(--space-md);
 }
 
 .modal-container {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
   max-width: 500px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
-  animation: modalEnter 0.2s ease-out;
+  animation: modalEnter var(--transition-slow) ease-out;
+  border: 1px solid var(--color-gray-200);
 }
 
 @keyframes modalEnter {
@@ -217,13 +218,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 1.5rem 0 1.5rem;
+  padding: var(--space-lg) var(--space-lg) 0 var(--space-lg);
 }
 
 .modal-title {
-  font-size: 1.25rem;
+  font-size: var(--text-xl);
   font-weight: 600;
-  color: #1e293b;
+  color: var(--color-text-primary);
   margin: 0;
 }
 
@@ -231,37 +232,38 @@ export default {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  color: #64748b;
-  transition: all 0.2s ease;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition: all var(--transition-base);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .close-button:hover {
-  background-color: #f1f5f9;
-  color: #334155;
+  background-color: var(--color-gray-100);
+  color: var(--color-text-primary);
 }
 
 .modal-body {
-  padding: 1.5rem;
+  padding: var(--space-lg);
 }
 
 .current-file {
   display: flex;
   align-items: center;
-  padding: 1rem;
-  background-color: #f8fafc;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  border: 1px solid #e2e8f0;
+  padding: var(--space-md);
+  background-color: var(--color-accent);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-lg);
+  border: 1px solid var(--color-cream-dark);
 }
 
 .file-icon {
-  font-size: 1.5rem;
-  margin-right: 1rem;
+  font-size: var(--text-2xl);
+  margin-right: var(--space-md);
+  color: var(--color-brown);
 }
 
 .file-details {
@@ -270,21 +272,21 @@ export default {
 
 .current-filename {
   font-weight: 500;
-  color: #1e293b;
-  margin: 0 0 0.25rem 0;
-  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-xs) 0;
+  font-size: var(--text-base);
 }
 
 .file-meta {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 
 .rename-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-lg);
 }
 
 .form-group {
@@ -293,62 +295,65 @@ export default {
 }
 
 .form-label {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.5rem;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
 }
 
 .form-input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s ease;
-  background-color: white;
+  padding: 0.75rem var(--space-md);
+  border: 2px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  transition: all var(--transition-base);
+  background-color: var(--color-white);
+  color: var(--color-text-primary);
+  font-family: var(--font-system);
 }
 
 .form-input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255, 165, 82, 0.1);
 }
 
 .form-input.error {
-  border-color: #ef4444;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 
 .error-message {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin: 0.5rem 0 0 0;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin: var(--space-sm) 0 0 0;
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: var(--space-xs);
 }
 
 .form-actions {
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
-  margin-top: 0.5rem;
+  margin-top: var(--space-sm);
 }
 
 .btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: 0.75rem var(--space-lg);
+  border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: none;
-  font-size: 0.875rem;
+  transition: all var(--transition-base);
+  border: 2px solid transparent;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-sm);
   min-width: 120px;
   justify-content: center;
+  font-family: var(--font-system);
 }
 
 .btn:disabled {
@@ -357,25 +362,28 @@ export default {
 }
 
 .btn-secondary {
-  background-color: #f8fafc;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
+  background-color: var(--color-gray-50);
+  color: var(--color-text-secondary);
+  border-color: var(--color-gray-200);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background-color: #f1f5f9;
-  border-color: #cbd5e1;
+  background-color: var(--color-gray-100);
+  border-color: var(--color-gray-300);
+  color: var(--color-text-primary);
 }
 
 .btn-primary {
-  background-color: #3b82f6;
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border-color: var(--color-primary);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background-color: #2563eb;
+  background-color: var(--color-brown);
+  border-color: var(--color-brown);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 12px rgba(186, 86, 36, 0.3);
 }
 
 .loading-spinner {
@@ -383,7 +391,7 @@ export default {
   height: 16px;
   border: 2px solid transparent;
   border-top: 2px solid currentColor;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: spin 1s linear infinite;
 }
 
@@ -395,7 +403,7 @@ export default {
 
 @media (max-width: 640px) {
   .modal-container {
-    margin: 1rem;
+    margin: var(--space-md);
     max-width: none;
     width: calc(100% - 2rem);
   }
