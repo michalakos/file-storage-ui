@@ -11,6 +11,8 @@ import FileUpload from '@/views/FileUpload.vue'
 import FilesView from '@/views/FilesView.vue'
 import SharedFilesView from '@/views/SharedFilesView.vue'
 import UsersView from '@/views/UsersView.vue'
+import UserDashboard from '@/components/UserDashboard.vue'
+import AdminDashboard from '@/components/AdminDashboard.vue'
 
 const routes = [
   {
@@ -66,11 +68,15 @@ const routes = [
   },
   {
     path: '/dashboard/user',
-    component: () => import('@/components/UserDashboard.vue'),
+    name: 'UserDashboard',
+    component: UserDashboard,
+    meta: { requiresAuth: true, requiresAdmin: false },
   },
   {
     path: '/dashboard/admin',
-    component: () => import('@/components/AdminDashboard.vue'),
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { requiresAuth: true, requiresAdmin: true },
   },
 ]
 
